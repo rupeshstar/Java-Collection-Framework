@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Java Collections Framework — Full Hierarchy</title>
+<style>
+  :root{
+    --iface-bg:#dbeafe; --iface-bd:#2563eb; --iface-tx:#1e3a8a;
+    --class-bg:#dcfce7; --class-bd:#16a34a; --class-tx:#14532d;
+    --method-bg:#ede9fe; --method-tx:#5b21b6;
+    --line:#cbd5e1;
+    --note-tx:#64748b;
+    --page-bg:#f8fafc; --card-bg:#ffffff; --ink:#0f172a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:32px 20px 60px; background:var(--page-bg);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);
+  }
+  h1{ text-align:center; font-size:26px; margin:0 0 4px; }
+  .subtitle{ text-align:center; color:var(--note-tx); font-size:14px; margin-bottom:6px; }
+  .hint{ text-align:center; color:#94a3b8; font-size:12.5px; margin-bottom:22px; }
+  .hint b{ color:#475569; }
+
+  /* legend */
+  .legend{
+    display:flex; justify-content:center; gap:22px; flex-wrap:wrap;
+    background:var(--card-bg); border:1px solid #e2e8f0; border-radius:10px;
+    padding:12px 18px; max-width:820px; margin:0 auto 32px; font-size:13px;
+  }
+  .legend-item{ display:flex; align-items:center; gap:7px; }
+  .swatch{ width:14px; height:14px; border-radius:4px; display:inline-block; }
+  .swatch.iface{ background:var(--iface-bg); border:2px solid var(--iface-bd); }
+  .swatch.cls{ background:var(--class-bg); border:2px solid var(--class-bd); }
+  .swatch.method{ background:var(--method-bg); border:2px solid var(--method-tx); }
+
+  section{
+    max-width:1000px; margin:0 auto 40px; background:var(--card-bg);
+    border:1px solid #e2e8f0; border-radius:14px; padding:24px 28px 30px;
+  }
+  section > h2{
+    font-size:17px; margin:0 0 18px; padding-bottom:10px;
+    border-bottom:2px solid #f1f5f9; color:var(--ink);
+  }
+  section > h2 .idx{ color:#94a3b8; font-weight:600; margin-right:6px; }
+
+  /* tree */
+  ul.tree, ul.tree ul{ list-style:none; margin:0; padding-left:26px; }
+  ul.tree{ padding-left:0; }
+  ul.tree li{ position:relative; padding:10px 0 0 26px; }
+  ul.tree > li{ padding-left:0; }
+  ul.tree li li::before{
+    content:""; position:absolute; left:0; top:26px; width:20px; height:0;
+    border-top:2px solid var(--line);
+  }
+  ul.tree li li::after{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:0;
+    border-left:2px solid var(--line);
+  }
+  ul.tree li li:last-child::after{ bottom:calc(100% - 26px); }
+
+  .node{
+    display:inline-block; border-radius:10px; padding:9px 13px 10px;
+    border:1.5px solid; margin-bottom:4px;
+    cursor:pointer; transition:box-shadow .15s ease, transform .15s ease;
+  }
+  .node:hover{ box-shadow:0 4px 14px rgba(15,23,42,.16); transform:translateY(-1px); }
+  .node.iface{ background:var(--iface-bg); border-color:var(--iface-bd); }
+  .node.cls{ background:var(--class-bg); border-color:var(--class-bd); }
+
+  .tag{
+    font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    padding:1px 7px; border-radius:5px; margin-right:8px; vertical-align:1px;
+  }
+  .node.iface .tag{ background:var(--iface-bd); color:#fff; }
+  .node.cls .tag{ background:var(--class-bd); color:#fff; }
+
+  .name{ font-weight:700; font-size:14.5px; }
+  .name .also{ font-weight:500; font-size:12px; color:var(--note-tx); margin-left:6px; }
+
+  .methods{ margin-top:7px; display:flex; flex-wrap:wrap; gap:5px; }
+  .m{
+    background:var(--method-bg); color:var(--method-tx); font:600 11.5px/1.4 ui-monospace,Menlo,Consolas,monospace;
+    padding:2px 7px; border-radius:5px; white-space:nowrap;
+    cursor:pointer; border:1.5px solid transparent; transition:box-shadow .12s ease, border-color .12s ease;
+  }
+  .m:hover{ border-color:var(--method-tx); box-shadow:0 2px 8px rgba(91,33,182,.2); }
+  .note{ margin-top:6px; font-size:11.5px; color:var(--note-tx); font-style:italic; }
+
+  @media (max-width:640px){
+    section{ padding:18px 14px 22px; }
+    ul.tree li{ padding-left:18px; }
+  }
+
+  /* overview / compact tree */
+  .overview{
+    max-width:1000px; margin:0 auto 34px; background:#0b1220; border-radius:14px;
+    overflow:hidden; box-shadow:0 10px 30px -12px rgba(15,23,42,.35);
+  }
+  .overview-bar{
+    display:flex; align-items:center; gap:8px; padding:11px 16px;
+    background:#151f30; border-bottom:1px solid #23324a;
+  }
+  .overview-bar .dot{ width:10px; height:10px; border-radius:50%; }
+  .overview-bar .dot:nth-child(1){ background:#f87171; }
+  .overview-bar .dot:nth-child(2){ background:#fbbf24; }
+  .overview-bar .dot:nth-child(3){ background:#4ade80; }
+  .overview-bar .title{
+    margin-left:8px; color:#94a3b8; font-size:12.5px; font-weight:600;
+    letter-spacing:.03em;
+  }
+  .overview pre{
+    margin:0; padding:20px 22px 18px; color:#cbd5e1;
+    font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;
+    overflow-x:auto; white-space:pre;
+  }
+  .overview pre .root{ color:#f8fafc; font-weight:700; }
+  .overview pre .sec{ color:#f8fafc; font-weight:700; }
+  .overview pre .iface{ color:#93c5fd; font-weight:700; }
+  .overview pre .cls{ color:#86efac; font-weight:700; }
+  .overview pre .method{ color:#d8b4fe; font-weight:700; }
+  .overview pre .ext{ color:#64748b; font-style:italic; }
+  .overview pre .term{ cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px; }
+  .overview pre .term:hover{ filter:brightness(1.35); }
+  .overview pre .method{ cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px; }
+  .overview pre .method:hover{ filter:brightness(1.35); }
+  .overview-note{
+    padding:0 22px 18px; color:#94a3b8; font-size:12px; border-top:1px solid #1b2436;
+    padding-top:12px; margin-top:-4px;
+  }
+  .overview-note b{ color:#e2e8f0; }
+  .overview-legend{
+    display:flex; gap:16px; flex-wrap:wrap; padding:0 22px 16px; font-size:11.5px; color:#94a3b8;
+  }
+  .overview-legend .k{ font-weight:700; }
+  .overview-legend .iface{ color:#93c5fd; }
+  .overview-legend .cls{ color:#86efac; }
+  .overview-legend .method{ color:#d8b4fe; }
+
+  /* term slide-over panel */
+  .term-overlay{
+    position:fixed; inset:0; background:rgba(15,23,42,.4); opacity:0; pointer-events:none;
+    transition:opacity .25s ease; z-index:999;
+  }
+  .term-overlay.open{ opacity:1; pointer-events:auto; }
+  .term-panel{
+    position:fixed; top:0; left:0; height:100vh; width:460px; max-width:92vw;
+    background:#fff; box-shadow:10px 0 34px rgba(15,23,42,.28);
+    transform:translateX(-105%); transition:transform .3s cubic-bezier(.2,.8,.2,1);
+    z-index:1000; display:flex; flex-direction:column;
+  }
+  .term-panel.open{ transform:translateX(0); }
+  .term-panel-head{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:22px 22px 16px; border-bottom:1px solid #e2e8f0; flex-shrink:0;
+  }
+  .tp-tag{
+    font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+    padding:2px 8px; border-radius:5px; color:#fff; display:inline-block; margin-bottom:8px;
+  }
+  .tp-tag.iface{ background:var(--iface-bd); }
+  .tp-tag.cls{ background:var(--class-bd); }
+  .tp-tag.method{ background:var(--method-tx); }
+  #tpName{ margin:0; font-size:21px; }
+  .tp-full{ font:12px ui-monospace,Menlo,Consolas,monospace; color:var(--note-tx); margin-top:5px; }
+  .tp-close{
+    border:none; background:#f1f5f9; width:32px; height:32px; border-radius:8px;
+    font-size:18px; line-height:1; cursor:pointer; color:#475569; flex-shrink:0;
+  }
+  .tp-close:hover{ background:#e2e8f0; }
+  .term-panel-body{ padding:6px 22px 40px; overflow-y:auto; flex:1; }
+  .term-panel-body h4{
+    font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:#94a3b8;
+    margin:22px 0 10px;
+  }
+  .term-panel-body h4:first-child{ margin-top:18px; }
+  #tpPoints{ margin:0; padding-left:18px; font-size:13.5px; line-height:1.65; color:#1e293b; }
+  #tpPoints li{ margin-bottom:7px; }
+  .qa-item{ background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:11px 14px; margin-bottom:10px; }
+  .qa-q{ font-weight:700; font-size:13px; display:flex; align-items:center; gap:7px; color:#0f172a; }
+  .qa-tricky{
+    font-size:9px; font-weight:800; background:#fef3c7; color:#92400e; padding:2px 6px;
+    border-radius:4px; text-transform:uppercase; letter-spacing:.03em; flex-shrink:0;
+  }
+  .qa-a{ font-size:12.5px; color:#334155; margin-top:6px; line-height:1.55; }
+  #tpExample{
+    background:#0b1220; color:#e2e8f0; border-radius:10px; padding:14px 16px;
+    font:12.5px/1.55 ui-monospace,Menlo,Consolas,monospace; overflow-x:auto; white-space:pre;
+  }
+  @media (max-width:640px){ .term-panel{ width:100vw; } }
+</style>
+</head>
+<body>
+
+<h1>Java Collections Framework</h1>
+<div class="subtitle">Full hierarchy — interfaces, implementing classes, and their most common methods</div>
+<div class="hint"><b>Tip:</b> click any interface or class name to open key points, interview questions, and a code example.</div>
+
+<div class="overview">
+  <div class="overview-bar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="title">overview.txt — compact tree (click a name)</span>
+  </div>
+  <pre><span class="root">Java Collections Framework</span>
+│
+├── 1. <span class="term iface" data-term="Collection">Collection [INTERFACE]</span>
+│   │
+│   ├── <span class="term iface" data-term="List">List [INTERFACE]</span>
+│   │   ├── <span class="term cls" data-term="ArrayList">ArrayList [CLASS]</span>
+│   │   ├── <span class="term cls" data-term="LinkedList">LinkedList [CLASS]</span>
+│   │   ├── <span class="term cls" data-term="Vector">Vector [CLASS]</span>
+│   │   └── <span class="term cls" data-term="Stack">Stack [CLASS]</span>
+│   │
+│   ├── <span class="term iface" data-term="Set">Set [INTERFACE]</span>
+│   │   ├── <span class="term cls" data-term="HashSet">HashSet [CLASS]</span>
+│   │   ├── <span class="term cls" data-term="LinkedHashSet">LinkedHashSet [CLASS]</span>
+│   │   └── <span class="term iface" data-term="SortedSet">SortedSet [INTERFACE]</span>
+│   │       └── <span class="term iface" data-term="NavigableSet">NavigableSet [INTERFACE]</span>
+│   │           └── <span class="term cls" data-term="TreeSet">TreeSet [CLASS]</span>
+│   │
+│   └── <span class="term iface" data-term="Queue">Queue [INTERFACE]</span>
+│       ├── <span class="term cls" data-term="PriorityQueue">PriorityQueue [CLASS]</span>
+│       │
+│       └── <span class="term iface" data-term="Deque">Deque [INTERFACE]</span>
+│           ├── <span class="term cls" data-term="ArrayDeque">ArrayDeque [CLASS]</span>
+│           └── <span class="term cls" data-term="LinkedList">LinkedList [CLASS]</span>
+│
+├── 2. <span class="term iface" data-term="Map">Map [INTERFACE]</span>
+│   │
+│   ├── <span class="term cls" data-term="HashMap">HashMap [CLASS]</span>
+│   ├── <span class="term cls" data-term="LinkedHashMap">LinkedHashMap [CLASS]</span>
+│   ├── <span class="term cls" data-term="Hashtable">Hashtable [CLASS]</span>
+│   │
+│   └── <span class="term iface" data-term="SortedMap">SortedMap [INTERFACE]</span>
+│       └── <span class="term iface" data-term="NavigableMap">NavigableMap [INTERFACE]</span>
+│           └── <span class="term cls" data-term="TreeMap">TreeMap [CLASS]</span>
+│
+├── <span class="sec">3. Traversal</span>
+│   │
+│   └── <span class="term iface" data-term="Iterator">Iterator [INTERFACE]</span>
+│       ├── <span class="method" data-method="Iterator__hasNext">hasNext() [METHOD]</span>
+│       ├── <span class="method" data-method="Iterator__next">next() [METHOD]</span>
+│       ├── <span class="method" data-method="Iterator__remove">remove() [METHOD]</span>
+│       │
+│       └── <span class="term iface" data-term="ListIterator">ListIterator [INTERFACE]</span> <span class="ext">(extends Iterator)</span>
+│           ├── <span class="method" data-method="ListIterator__hasPrevious">hasPrevious() [METHOD]</span>
+│           ├── <span class="method" data-method="ListIterator__previous">previous() [METHOD]</span>
+│           ├── <span class="method" data-method="ListIterator__nextIndex">nextIndex() [METHOD]</span>
+│           └── <span class="method" data-method="ListIterator__previousIndex">previousIndex() [METHOD]</span>
+│
+├── <span class="sec">4. Ordering</span>
+│   │
+│   ├── <span class="term iface" data-term="Comparable">Comparable [INTERFACE]</span>
+│   │   └── <span class="method" data-method="Comparable__compareTo">compareTo() [METHOD]</span>
+│   │
+│   └── <span class="term iface" data-term="Comparator">Comparator [INTERFACE]</span>
+│       └── <span class="method" data-method="Comparator__compare">compare() [METHOD]</span>
+│
+└── <span class="sec">5. Utility</span>
+    │
+    └── <span class="term cls" data-term="Collections">Collections [CLASS]</span>
+        ├── <span class="method" data-method="Collections__sort">sort() [METHOD]</span>
+        ├── <span class="method" data-method="Collections__reverse">reverse() [METHOD]</span>
+        ├── <span class="method" data-method="Collections__shuffle">shuffle() [METHOD]</span>
+        ├── <span class="method" data-method="Collections__min">min() [METHOD]</span>
+        ├── <span class="method" data-method="Collections__max">max() [METHOD]</span>
+        └── <span class="method" data-method="Collections__binarySearch">binarySearch() [METHOD]</span></pre>
+  <div class="overview-legend">
+    <span><span class="k iface">■</span> Interface</span>
+    <span><span class="k cls">■</span> Class</span>
+    <span><span class="k method">■</span> Method</span>
+  </div>
+  <div class="overview-note">
+    <b>Correction vs. the original sketch:</b> <code>ListIterator</code> is nested under <code>Iterator</code> here (not a separate sibling) because
+    <code>ListIterator</code> actually <em>extends</em> <code>Iterator</code> in the JDK — that's the true inheritance relationship.
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><span class="swatch iface"></span> Interface</div>
+  <div class="legend-item"><span class="swatch cls"></span> Class</div>
+  <div class="legend-item"><span class="swatch method"></span> Method</div>
+  <div class="legend-item"><em style="color:var(--note-tx)">italic text</em> = notes / behavior</div>
+</div>
+
+<!-- ================= 1. COLLECTION / LIST ================= -->
+<section>
+  <h2><span class="idx">1</span>Collection → List Family</h2>
+  <ul class="tree">
+    <li>
+      <div class="node iface" data-term="Collection"><span class="tag">Interface</span><span class="name">Collection</span></div>
+      <div class="methods">
+        <span class="m" data-method="Collection__add">add(e)</span><span class="m" data-method="Collection__remove">remove(o)</span><span class="m" data-method="Collection__size">size()</span>
+        <span class="m" data-method="Collection__isEmpty">isEmpty()</span><span class="m" data-method="Collection__contains">contains(o)</span><span class="m" data-method="Collection__clear">clear()</span>
+        <span class="m" data-method="Collection__iterator">iterator()</span><span class="m" data-method="Collection__addAll">addAll(c)</span><span class="m" data-method="Collection__removeAll">removeAll(c)</span>
+        <span class="m" data-method="Collection__retainAll">retainAll(c)</span><span class="m" data-method="Collection__toArray">toArray()</span><span class="m" data-method="Collection__stream">stream()</span>
+      </div>
+      <ul>
+        <li>
+          <div class="node iface" data-term="List"><span class="tag">Interface</span><span class="name">List</span></div>
+          <div class="methods">
+            <span class="m" data-method="List__get">get(i)</span><span class="m" data-method="List__set">set(i,e)</span><span class="m" data-method="List__addAt">add(i,e)</span>
+            <span class="m" data-method="List__removeAt">remove(i)</span><span class="m" data-method="List__indexOf">indexOf(o)</span><span class="m" data-method="List__lastIndexOf">lastIndexOf(o)</span>
+            <span class="m" data-method="List__subList">subList(from,to)</span><span class="m" data-method="List__listIterator">listIterator()</span>
+          </div>
+          <ul>
+            <li>
+              <div class="node cls" data-term="ArrayList"><span class="tag">Class</span><span class="name">ArrayList</span></div>
+              <div class="methods"><span class="m" data-method="ArrayList__ensureCapacity">ensureCapacity(n)</span><span class="m" data-method="ArrayList__trimToSize">trimToSize()</span><span class="m" data-method="ArrayList__clone">clone()</span></div>
+              <div class="note">Resizable array · O(1) get / add-at-end · not synchronized</div>
+            </li>
+            <li>
+              <div class="node cls" data-term="LinkedList"><span class="tag">Class</span><span class="name">LinkedList<span class="also">(also implements Deque)</span></span></div>
+              <div class="methods">
+                <span class="m" data-method="Deque__addFirst">addFirst(e)</span><span class="m" data-method="Deque__addLast">addLast(e)</span><span class="m" data-method="LinkedList__removeFirst">removeFirst()</span>
+                <span class="m" data-method="LinkedList__removeLast">removeLast()</span><span class="m" data-method="LinkedList__getFirst">getFirst()</span><span class="m" data-method="LinkedList__getLast">getLast()</span>
+                <span class="m" data-method="Queue__peek">peek()</span><span class="m" data-method="Queue__poll">poll()</span>
+              </div>
+              <div class="note">Doubly linked list · O(1) insert/delete at ends · O(n) random access</div>
+            </li>
+            <li>
+              <div class="node cls" data-term="Vector"><span class="tag">Class</span><span class="name">Vector</span></div>
+              <div class="methods"><span class="m" data-method="Vector__addElement">addElement(e)</span><span class="m" data-method="Vector__elementAt">elementAt(i)</span><span class="m" data-method="Vector__firstElement">firstElement()</span><span class="m" data-method="Vector__lastElement">lastElement()</span></div>
+              <div class="note">Legacy · synchronized (thread-safe but slower)</div>
+            </li>
+            <li>
+              <div class="node cls" data-term="Stack"><span class="tag">Class</span><span class="name">Stack<span class="also">(extends Vector)</span></span></div>
+              <div class="methods"><span class="m" data-method="Stack__push">push(e)</span><span class="m" data-method="Stack__pop">pop()</span><span class="m" data-method="Stack__peek">peek()</span><span class="m" data-method="Stack__empty">empty()</span><span class="m" data-method="Stack__search">search(o)</span></div>
+              <div class="note">LIFO order</div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</section>
+
+<!-- ================= 2. COLLECTION / SET ================= -->
+<section>
+  <h2><span class="idx">2</span>Collection → Set Family</h2>
+  <ul class="tree">
+    <li>
+      <div class="node iface" data-term="Collection"><span class="tag">Interface</span><span class="name">Collection</span></div>
+      <ul>
+        <li>
+          <div class="node iface" data-term="Set"><span class="tag">Interface</span><span class="name">Set</span></div>
+          <div class="methods"><span class="m" data-method="Collection__add">add(e)</span><span class="m" data-method="Collection__contains">contains(o)</span><span class="m" data-method="Collection__remove">remove(o)</span></div>
+          <div class="note">No duplicate elements</div>
+          <ul>
+            <li>
+              <div class="node cls" data-term="HashSet"><span class="tag">Class</span><span class="name">HashSet</span></div>
+              <div class="note">Hash table backed · no ordering guarantee · O(1) average add/contains</div>
+            </li>
+            <li>
+              <div class="node cls" data-term="LinkedHashSet"><span class="tag">Class</span><span class="name">LinkedHashSet<span class="also">(extends HashSet)</span></span></div>
+              <div class="note">Maintains insertion order</div>
+            </li>
+            <li>
+              <div class="node iface" data-term="SortedSet"><span class="tag">Interface</span><span class="name">SortedSet</span></div>
+              <div class="methods"><span class="m" data-method="SortedSet__first">first()</span><span class="m" data-method="SortedSet__last">last()</span><span class="m" data-method="SortedSet__headSet">headSet(to)</span><span class="m" data-method="SortedSet__tailSet">tailSet(from)</span><span class="m" data-method="SortedSet__subSet">subSet(from,to)</span></div>
+              <ul>
+                <li>
+                  <div class="node iface" data-term="NavigableSet"><span class="tag">Interface</span><span class="name">NavigableSet</span></div>
+                  <div class="methods">
+                    <span class="m" data-method="NavigableSet__floor">floor(e)</span><span class="m" data-method="NavigableSet__ceiling">ceiling(e)</span><span class="m" data-method="NavigableSet__higher">higher(e)</span><span class="m" data-method="NavigableSet__lower">lower(e)</span>
+                    <span class="m" data-method="NavigableSet__pollFirst">pollFirst()</span><span class="m" data-method="NavigableSet__pollLast">pollLast()</span><span class="m" data-method="NavigableSet__descendingSet">descendingSet()</span>
+                  </div>
+                  <ul>
+                    <li>
+                      <div class="node cls" data-term="TreeSet"><span class="tag">Class</span><span class="name">TreeSet</span></div>
+                      <div class="note">Red-Black tree · sorted order · O(log n) add/remove/contains</div>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</section>
+
+<!-- ================= 3. COLLECTION / QUEUE & DEQUE ================= -->
+<section>
+  <h2><span class="idx">3</span>Collection → Queue &amp; Deque Family</h2>
+  <ul class="tree">
+    <li>
+      <div class="node iface" data-term="Collection"><span class="tag">Interface</span><span class="name">Collection</span></div>
+      <ul>
+        <li>
+          <div class="node iface" data-term="Queue"><span class="tag">Interface</span><span class="name">Queue</span></div>
+          <div class="methods"><span class="m" data-method="Queue__offer">offer(e)</span><span class="m" data-method="Queue__poll">poll()</span><span class="m" data-method="Queue__peek">peek()</span><span class="m" data-method="Queue__element">element()</span><span class="m" data-method="Queue__remove">remove()</span></div>
+          <ul>
+            <li>
+              <div class="node cls" data-term="PriorityQueue"><span class="tag">Class</span><span class="name">PriorityQueue</span></div>
+              <div class="note">Binary heap · natural order or Comparator · O(log n) offer/poll</div>
+            </li>
+            <li>
+              <div class="node iface" data-term="Deque"><span class="tag">Interface</span><span class="name">Deque</span></div>
+              <div class="methods">
+                <span class="m" data-method="Deque__addFirst">addFirst(e)</span><span class="m" data-method="Deque__addLast">addLast(e)</span><span class="m" data-method="Deque__offerFirst">offerFirst(e)</span>
+                <span class="m" data-method="Deque__offerLast">offerLast(e)</span><span class="m" data-method="Deque__pollFirst">pollFirst()</span><span class="m" data-method="Deque__pollLast">pollLast()</span>
+                <span class="m" data-method="Deque__push">push(e)</span><span class="m" data-method="Deque__pop">pop()</span>
+              </div>
+              <div class="note">Double-ended queue — usable as stack or queue</div>
+              <ul>
+                <li>
+                  <div class="node cls" data-term="ArrayDeque"><span class="tag">Class</span><span class="name">ArrayDeque</span></div>
+                  <div class="note">Resizable array · faster than Stack/LinkedList for stack &amp; queue ops · no nulls</div>
+                </li>
+                <li>
+                  <div class="node cls" data-term="LinkedList"><span class="tag">Class</span><span class="name">LinkedList<span class="also">(dual role — see List family)</span></span></div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</section>
+
+<!-- ================= 4. MAP ================= -->
+<section>
+  <h2><span class="idx">4</span>Map Hierarchy</h2>
+  <ul class="tree">
+    <li>
+      <div class="node iface" data-term="Map"><span class="tag">Interface</span><span class="name">Map</span></div>
+      <div class="methods">
+        <span class="m" data-method="Map__put">put(k,v)</span><span class="m" data-method="Map__get">get(k)</span><span class="m" data-method="Map__remove">remove(k)</span>
+        <span class="m" data-method="Map__containsKey">containsKey(k)</span><span class="m" data-method="Map__containsValue">containsValue(v)</span><span class="m" data-method="Map__keySet">keySet()</span>
+        <span class="m" data-method="Map__values">values()</span><span class="m" data-method="Map__entrySet">entrySet()</span><span class="m" data-method="Map__putIfAbsent">putIfAbsent(k,v)</span>
+        <span class="m" data-method="Map__getOrDefault">getOrDefault(k,d)</span><span class="m" data-method="Map__merge">merge(k,v,fn)</span><span class="m" data-method="Map__compute">compute(k,fn)</span>
+        <span class="m" data-method="Map__forEach">forEach()</span>
+      </div>
+      <ul>
+        <li>
+          <div class="node cls" data-term="HashMap"><span class="tag">Class</span><span class="name">HashMap</span></div>
+          <div class="note">Hash table · one null key allowed · O(1) average get/put</div>
+        </li>
+        <li>
+          <div class="node cls" data-term="LinkedHashMap"><span class="tag">Class</span><span class="name">LinkedHashMap<span class="also">(extends HashMap)</span></span></div>
+          <div class="note">Maintains insertion (or access) order</div>
+        </li>
+        <li>
+          <div class="node cls" data-term="Hashtable"><span class="tag">Class</span><span class="name">Hashtable</span></div>
+          <div class="note">Legacy · synchronized · no null keys/values</div>
+        </li>
+        <li>
+          <div class="node iface" data-term="SortedMap"><span class="tag">Interface</span><span class="name">SortedMap</span></div>
+          <div class="methods"><span class="m" data-method="SortedMap__firstKey">firstKey()</span><span class="m" data-method="SortedMap__lastKey">lastKey()</span><span class="m" data-method="SortedMap__headMap">headMap(to)</span><span class="m" data-method="SortedMap__tailMap">tailMap(from)</span><span class="m" data-method="SortedMap__subMap">subMap(from,to)</span></div>
+          <ul>
+            <li>
+              <div class="node iface" data-term="NavigableMap"><span class="tag">Interface</span><span class="name">NavigableMap</span></div>
+              <div class="methods">
+                <span class="m" data-method="NavigableMap__floorKey">floorKey(k)</span><span class="m" data-method="NavigableMap__ceilingKey">ceilingKey(k)</span><span class="m" data-method="NavigableMap__higherKey">higherKey(k)</span>
+                <span class="m" data-method="NavigableMap__lowerKey">lowerKey(k)</span><span class="m" data-method="NavigableMap__firstEntry">firstEntry()</span><span class="m" data-method="NavigableMap__lastEntry">lastEntry()</span>
+                <span class="m" data-method="NavigableMap__pollFirstEntry">pollFirstEntry()</span><span class="m" data-method="NavigableMap__pollLastEntry">pollLastEntry()</span>
+              </div>
+              <ul>
+                <li>
+                  <div class="node cls" data-term="TreeMap"><span class="tag">Class</span><span class="name">TreeMap</span></div>
+                  <div class="note">Red-Black tree · sorted by key · O(log n) get/put</div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</section>
+
+<!-- ================= 5. TRAVERSAL / ORDERING / UTILITY ================= -->
+<section>
+  <h2><span class="idx">5</span>Traversal, Ordering &amp; Utility</h2>
+
+  <ul class="tree">
+    <li>
+      <div class="node iface" data-term="Iterator"><span class="tag">Interface</span><span class="name">Iterator</span></div>
+      <div class="methods"><span class="m" data-method="Iterator__hasNext">hasNext()</span><span class="m" data-method="Iterator__next">next()</span><span class="m" data-method="Iterator__remove">remove()</span></div>
+      <ul>
+        <li>
+          <div class="node iface" data-term="ListIterator"><span class="tag">Interface</span><span class="name">ListIterator<span class="also">(extends Iterator)</span></span></div>
+          <div class="methods">
+            <span class="m" data-method="ListIterator__hasPrevious">hasPrevious()</span><span class="m" data-method="ListIterator__previous">previous()</span><span class="m" data-method="ListIterator__nextIndex">nextIndex()</span>
+            <span class="m" data-method="ListIterator__previousIndex">previousIndex()</span><span class="m" data-method="ListIterator__set">set(e)</span><span class="m" data-method="ListIterator__add">add(e)</span>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul class="tree" style="margin-top:18px;">
+    <li>
+      <div class="node iface" data-term="Comparable"><span class="tag">Interface</span><span class="name">Comparable</span></div>
+      <div class="methods"><span class="m" data-method="Comparable__compareTo">compareTo(o)</span></div>
+      <div class="note">Defines a class's natural ordering</div>
+    </li>
+  </ul>
+
+  <ul class="tree" style="margin-top:14px;">
+    <li>
+      <div class="node iface" data-term="Comparator"><span class="tag">Interface</span><span class="name">Comparator</span></div>
+      <div class="methods">
+        <span class="m" data-method="Comparator__compare">compare(o1,o2)</span><span class="m" data-method="Comparator__reversed">reversed()</span><span class="m" data-method="Comparator__thenComparing">thenComparing()</span>
+        <span class="m" data-method="Comparator__naturalOrder">naturalOrder()</span><span class="m" data-method="Comparator__reverseOrder">reverseOrder()</span>
+      </div>
+      <div class="note">External / pluggable ordering</div>
+    </li>
+  </ul>
+
+  <ul class="tree" style="margin-top:14px;">
+    <li>
+      <div class="node cls" data-term="Collections"><span class="tag">Class</span><span class="name">Collections<span class="also">(static utility)</span></span></div>
+      <div class="methods">
+        <span class="m" data-method="Collections__sort">sort(list)</span><span class="m" data-method="Collections__sort">sort(list,cmp)</span><span class="m" data-method="Collections__reverse">reverse(list)</span>
+        <span class="m" data-method="Collections__shuffle">shuffle(list)</span><span class="m" data-method="Collections__min">min(coll)</span><span class="m" data-method="Collections__max">max(coll)</span>
+        <span class="m" data-method="Collections__binarySearch">binarySearch(list,key)</span><span class="m" data-method="Collections__unmodifiableList">unmodifiableList(list)</span>
+        <span class="m" data-method="Collections__synchronizedList">synchronizedList(list)</span><span class="m" data-method="Collections__emptyList">emptyList()</span>
+        <span class="m" data-method="Collections__frequency">frequency(coll,o)</span><span class="m" data-method="Collections__swap">swap(list,i,j)</span><span class="m" data-method="Collections__nCopies">nCopies(n,o)</span>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<div id="overlay" class="term-overlay"></div>
+<aside id="termPanel" class="term-panel">
+  <div class="term-panel-head">
+    <div>
+      <span id="tpTag" class="tp-tag"></span>
+      <h3 id="tpName"></h3>
+      <div id="tpFull" class="tp-full"></div>
+    </div>
+    <button id="tpClose" class="tp-close" aria-label="Close">×</button>
+  </div>
+  <div class="term-panel-body">
+    <h4>Key points</h4>
+    <ul id="tpPoints"></ul>
+    <h4>Interview questions</h4>
+    <div id="tpQA"></div>
+    <h4>Complex example</h4>
+    <pre id="tpExample"></pre>
+  </div>
+</aside>
+
+<script>
+const TERMS = {
+  Collection: {
+    type: 'interface', full: 'java.util.Collection<E>',
+    points: [
+      `Root interface of the collection hierarchy (Map is deliberately excluded).`,
+      `Declares core operations: add, remove, size, isEmpty, contains, iterator, clear.`,
+      `Extended by List, Set, and Queue — each layers on its own contract (ordering / duplicates / FIFO).`,
+      `Java 8+ default methods: stream(), forEach(), removeIf().`
+    ],
+    qa: [
+      { q: `Why doesn't Map extend Collection?`, a: `A Map stores key-value pairs, not single elements — its natural "elements" are Map.Entry objects, which would break Collection's single-element contract (add(E), iterate over E). Keeping them separate avoids a mismatched API.` },
+      { q: `Is Collection the same as Collections?`, a: `No — Collection is an interface (root of the hierarchy). Collections is an unrelated static utility class full of helper methods like sort() and shuffle(). Mixing them up is one of the most common interview slip-ups.`, tricky: true }
+    ],
+    example: `Collection<String> c = new ArrayList<>(List.of("b","a","c"));
+c.removeIf(s -> s.equals("a"));   // default method, Java 8+
+c.forEach(System.out::println);   // b, c`
+  },
+  List: {
+    type: 'interface', full: 'java.util.List<E>',
+    points: [
+      `Ordered collection (a sequence); elements are accessed by zero-based index.`,
+      `Allows duplicate elements.`,
+      `Adds positional operations: get(i), set(i,e), add(i,e), indexOf(o).`,
+      `Provides listIterator() for bidirectional traversal.`
+    ],
+    qa: [
+      { q: `When should you use List over Set?`, a: `Whenever order matters and/or duplicate elements need to be allowed.` },
+      { q: `Can you add to the list returned by List.of("a","b")?`, a: `No — List.of(...) returns an immutable list; add() throws UnsupportedOperationException. Interviewers use this to catch the assumption that "it's a List, so it must be mutable."`, tricky: true }
+    ],
+    example: `List<Integer> nums = new ArrayList<>(List.of(3,1,2));
+Collections.sort(nums);
+System.out.println(nums.subList(0,2)); // [1, 2] — a VIEW, not a copy!`
+  },
+  ArrayList: {
+    type: 'class', full: 'java.util.ArrayList<E>',
+    points: [
+      `Backed by a resizable array; default initial capacity 10, grows ~50% when full.`,
+      `get(i)/set(i,e) are O(1). add(e) at the end is O(1) amortized; add(i,e)/remove(i) are O(n) — elements shift.`,
+      `Not synchronized — wrap with Collections.synchronizedList() or use CopyOnWriteArrayList for thread safety.`,
+      `Allows null elements and duplicates; preserves insertion order.`
+    ],
+    qa: [
+      { q: `ArrayList vs LinkedList — when do you pick which?`, a: `ArrayList for frequent random access/iteration; LinkedList when you mostly insert/delete at the ends or via an iterator.` },
+      { q: `What happens if you remove an element from an ArrayList inside a for-each loop?`, a: `ConcurrentModificationException — the internal Iterator is fail-fast and detects the structural change via modCount. Use Iterator.remove() (or an index-based loop) instead.`, tricky: true }
+    ],
+    example: `List<Integer> list = new ArrayList<>(List.of(1,2,3));
+for (Integer n : list) {
+    if (n == 2) list.remove(n); // throws ConcurrentModificationException
+}`
+  },
+  LinkedList: {
+    type: 'class', full: 'java.util.LinkedList<E>',
+    points: [
+      `Doubly linked list; implements both List and Deque.`,
+      `O(1) insert/delete at head or tail; O(n) random access — get(i) walks the list.`,
+      `Higher per-element memory overhead than ArrayList (each node stores 2 pointers + data).`,
+      `Commonly used as a Deque/Stack/Queue implementation via addFirst/addLast/poll.`
+    ],
+    qa: [
+      { q: `Why is LinkedList rarely the default choice today?`, a: `Modern CPUs favor contiguous, cache-friendly memory (ArrayList's array). ArrayDeque also usually outperforms LinkedList for stack/queue use cases with less per-node overhead.` },
+      { q: `Is LinkedList synchronized?`, a: `No — like ArrayList, it is unsynchronized and needs external synchronization for safe concurrent access.`, tricky: true }
+    ],
+    example: `Deque<Integer> stack = new LinkedList<>();
+stack.push(1); stack.push(2);
+System.out.println(stack.pop()); // 2 — LIFO via Deque methods`
+  },
+  Vector: {
+    type: 'class', full: 'java.util.Vector<E>',
+    points: [
+      `Legacy class (pre-Java 2), retrofitted to implement List.`,
+      `Synchronized — every individual method is thread-safe, but compound actions still need external locking.`,
+      `Grows by doubling capacity by default (vs. ArrayList's ~50% growth).`,
+      `Rarely used in new code; prefer ArrayList plus explicit synchronization, or a concurrent collection.`
+    ],
+    qa: [
+      { q: `Is Vector thread-safe for a "check-then-act" sequence like "if not present, add"?`, a: `No — individual methods are synchronized, but a sequence such as "if (!v.contains(x)) v.add(x)" is still a race condition across two calls.` },
+      { q: `Stack extends Vector — is that good design?`, a: `It's widely considered a design mistake: Stack inherits List methods like add(index, e) that can violate LIFO discipline. ArrayDeque is the modern recommended stack.`, tricky: true }
+    ],
+    example: `Vector<Integer> v = new Vector<>();
+v.addElement(1); v.addElement(2);
+v.insertElementAt(0, 0); // legacy API works alongside List methods`
+  },
+  Stack: {
+    type: 'class', full: 'java.util.Stack<E>',
+    points: [
+      `Extends Vector; adds push/pop/peek/empty/search for LIFO behavior.`,
+      `Still inherits every Vector/List method — so LIFO order isn't actually enforced by the type.`,
+      `Synchronized (inherited from Vector) — slower than ArrayDeque for single-threaded use.`,
+      `java.util.Deque (via ArrayDeque) is the modern recommended replacement.`
+    ],
+    qa: [
+      { q: `Why is ArrayDeque preferred over Stack today?`, a: `No synchronization overhead, no legacy Vector baggage, and it correctly and exclusively models the Deque contract.` },
+      { q: `Since Stack extends Vector, can you call add(0, x) and silently break LIFO order?`, a: `Yes — it compiles and runs fine, quietly corrupting the "stack" semantics. That's exactly why the design is considered flawed.`, tricky: true }
+    ],
+    example: `Stack<Integer> s = new Stack<>();
+s.push(1); s.push(2); s.push(3);
+System.out.println(s.pop()); // 3`
+  },
+  Set: {
+    type: 'interface', full: 'java.util.Set<E>',
+    points: [
+      `A Collection that forbids duplicate elements, based on equals()/hashCode() (or compareTo for sorted sets).`,
+      `No positional access — there is no get(index).`,
+      `Three common flavors: HashSet (no order), LinkedHashSet (insertion order), TreeSet (sorted order).`,
+      `add() returns false when the element already exists instead of throwing.`
+    ],
+    qa: [
+      { q: `How does a Set detect a duplicate?`, a: `Hash-based sets use hashCode() + equals(); sorted sets use compareTo() or a supplied Comparator.` },
+      { q: `If you override equals() but not hashCode(), what breaks in a HashSet?`, a: `Duplicates can slip through — two "equal" objects can land in different buckets, so the set can end up containing two elements that are equal(). Always override both together.`, tricky: true }
+    ],
+    example: `Set<String> s = new HashSet<>();
+s.add("a"); s.add("a");
+System.out.println(s.size()); // 1`
+  },
+  HashSet: {
+    type: 'class', full: 'java.util.HashSet<E>',
+    points: [
+      `Internally backed by a HashMap (elements stored as keys, mapped to a dummy constant value).`,
+      `O(1) average add/remove/contains; no guaranteed iteration order.`,
+      `Allows exactly one null element.`,
+      `Not synchronized.`
+    ],
+    qa: [
+      { q: `What's the real backing data structure of HashSet?`, a: `A HashMap<E,Object> where each element is a key mapped to a shared PRESENT sentinel object.` },
+      { q: `Is HashSet's iteration order guaranteed to be consistent between runs?`, a: `No — it depends on internal bucket layout, which can even differ across JVM versions or between runs. Never rely on it.`, tricky: true }
+    ],
+    example: `Set<Integer> s = new HashSet<>(List.of(5,3,9,1));
+System.out.println(s); // order not guaranteed`
+  },
+  LinkedHashSet: {
+    type: 'class', full: 'java.util.LinkedHashSet<E>',
+    points: [
+      `Extends HashSet, threading a doubly linked list through entries to preserve insertion order.`,
+      `Slightly more memory/overhead than HashSet, but still O(1) average operations.`,
+      `Good middle ground: hash performance plus predictable iteration order.`
+    ],
+    qa: [
+      { q: `When would you pick LinkedHashSet over TreeSet?`, a: `When you need predictable (insertion) order but not sorted order, and want O(1) operations instead of TreeSet's O(log n).` },
+      { q: `Does re-adding an existing element move it in LinkedHashSet's order?`, a: `No — position is fixed at first insertion; re-adding a duplicate is a no-op for ordering (unlike LinkedHashMap's optional access-order mode).`, tricky: true }
+    ],
+    example: `Set<String> s = new LinkedHashSet<>();
+s.add("c"); s.add("a"); s.add("b");
+System.out.println(s); // [c, a, b] — insertion order preserved`
+  },
+  SortedSet: {
+    type: 'interface', full: 'java.util.SortedSet<E>',
+    points: [
+      `Guarantees ascending iteration order — natural order, or via a supplied Comparator.`,
+      `Adds first(), last(), and the range views headSet(), tailSet(), subSet().`,
+      `Extended by NavigableSet for closest-match navigation.`
+    ],
+    qa: [
+      { q: `What must elements satisfy to live in a SortedSet?`, a: `They must be mutually Comparable, or a Comparator must be supplied when the set is constructed.` },
+      { q: `Are headSet()/tailSet()/subSet() views or copies?`, a: `Views — backed by the original set. Changes made through the view (or the source set) are reflected in both.`, tricky: true }
+    ],
+    example: `SortedSet<Integer> s = new TreeSet<>(List.of(5,1,3,9));
+System.out.println(s.headSet(5)); // [1, 3]`
+  },
+  NavigableSet: {
+    type: 'interface', full: 'java.util.NavigableSet<E>',
+    points: [
+      `Extends SortedSet with closest-match navigation: floor(), ceiling(), higher(), lower().`,
+      `Adds pollFirst()/pollLast() (retrieve-and-remove) and descendingSet()/descendingIterator().`,
+      `TreeSet is its only implementation in the JDK.`
+    ],
+    qa: [
+      { q: `floor() vs lower() — what's the difference?`, a: `floor(e) returns the greatest element ≤ e (inclusive); lower(e) returns the greatest element strictly < e (excludes e itself).` },
+      { q: `What does ceiling(e) return if e is already in the set?`, a: `e itself — ceiling is "≥", not strict. Mixing this up with higher(), which IS strict, is a classic gotcha.`, tricky: true }
+    ],
+    example: `NavigableSet<Integer> s = new TreeSet<>(List.of(10,20,30));
+System.out.println(s.floor(25));   // 20
+System.out.println(s.ceiling(20)); // 20 (inclusive)
+System.out.println(s.higher(20));  // 30 (strict)`
+  },
+  TreeSet: {
+    type: 'class', full: 'java.util.TreeSet<E>',
+    points: [
+      `Implements NavigableSet, backed by a Red-Black tree (self-balancing binary search tree).`,
+      `O(log n) add/remove/contains; iterates in sorted order.`,
+      `Elements must be mutually Comparable, or a Comparator must be supplied.`,
+      `Throws NullPointerException on null with natural ordering (comparing to null fails).`
+    ],
+    qa: [
+      { q: `Why does TreeSet reject null?`, a: `It must compare elements to place them in the tree; comparing against null throws NullPointerException inside compareTo()/compare().` },
+      { q: `If two elements have compareTo() == 0 but are not equals(), does TreeSet keep both?`, a: `No — TreeSet treats compareTo() == 0 as "duplicate" and keeps only the first one inserted, even if equals() says they're different. TreeSet's notion of equality is "consistent with compareTo", not equals().`, tricky: true }
+    ],
+    example: `TreeSet<String> s = new TreeSet<>(Comparator.comparing(String::length));
+s.add("cat"); s.add("dog"); // same length -> treated as a duplicate
+System.out.println(s); // [cat]`
+  },
+  Queue: {
+    type: 'interface', full: 'java.util.Queue<E>',
+    points: [
+      `FIFO-oriented collection; adds offer/poll/peek (non-throwing) alongside add/remove/element (throwing on failure).`,
+      `Implemented by PriorityQueue (priority order, not FIFO) and by the Deque implementations.`,
+      `offer() returns false instead of throwing when a bounded queue is full.`
+    ],
+    qa: [
+      { q: `poll() vs remove() on an empty queue — what's the difference?`, a: `poll() returns null; remove() throws NoSuchElementException.` },
+      { q: `Is a PriorityQueue actually FIFO, since it implements Queue?`, a: `No — despite implementing Queue, PriorityQueue orders elements by priority (natural order or Comparator), not by insertion order. This trips up a lot of candidates.`, tricky: true }
+    ],
+    example: `Queue<Integer> q = new LinkedList<>();
+q.offer(1); q.offer(2);
+System.out.println(q.poll()); // 1 (FIFO)`
+  },
+  PriorityQueue: {
+    type: 'class', full: 'java.util.PriorityQueue<E>',
+    points: [
+      `Backed by a binary heap (array-based); the head is always the smallest element (natural order or Comparator).`,
+      `offer()/poll() are O(log n); peek() is O(1).`,
+      `Not thread-safe; iterating the queue does NOT return sorted order — only repeated poll() calls do.`,
+      `Does not allow null elements.`
+    ],
+    qa: [
+      { q: `How do you build a max-heap with PriorityQueue?`, a: `Pass a reversing Comparator: new PriorityQueue<>(Comparator.reverseOrder()).` },
+      { q: `If you iterate a PriorityQueue with a for-each loop, do you get sorted output?`, a: `No — the backing array is only heap-ordered, not fully sorted. Only draining it with poll() repeatedly returns elements in sorted order.`, tricky: true }
+    ],
+    example: `PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());
+maxHeap.addAll(List.of(3,1,4,1,5));
+System.out.println(maxHeap.poll()); // 5`
+  },
+  Deque: {
+    type: 'interface', full: 'java.util.Deque<E>',
+    points: [
+      `"Double-ended queue" — insert/remove from both ends: addFirst/addLast, offerFirst/offerLast, pollFirst/pollLast.`,
+      `Can serve as both a Stack (push/pop) and a Queue (offer/poll).`,
+      `Implemented by ArrayDeque (recommended) and by LinkedList.`,
+      `ArrayDeque disallows null elements; LinkedList allows them.`
+    ],
+    qa: [
+      { q: `Why is ArrayDeque preferred over Stack/LinkedList for stack operations?`, a: `Lower overhead — no synchronization like Stack, no per-node pointer chasing like LinkedList — plus better cache locality.` },
+      { q: `Does ArrayDeque allow null elements?`, a: `No — it explicitly throws NullPointerException, because null is used internally as a sentinel for an empty slot.`, tricky: true }
+    ],
+    example: `Deque<Integer> dq = new ArrayDeque<>();
+dq.addFirst(1); dq.addLast(2);
+System.out.println(dq); // [1, 2]`
+  },
+  ArrayDeque: {
+    type: 'class', full: 'java.util.ArrayDeque<E>',
+    points: [
+      `Resizable circular-array implementation of Deque.`,
+      `Faster than both Stack and LinkedList for stack/queue operations; amortized O(1) at both ends.`,
+      `No fixed capacity limit — grows as needed; disallows null elements.`,
+      `Not thread-safe.`
+    ],
+    qa: [
+      { q: `Can ArrayDeque replace Stack?`, a: `Yes — and it's the officially recommended replacement; push/pop/peek all work, with better performance and no synchronization overhead.` },
+      { q: `Is ArrayDeque a substitute for PriorityQueue?`, a: `No — ArrayDeque has no priority ordering; it's purely insertion-order (FIFO/LIFO). Confusing the two is a common mistake.`, tricky: true }
+    ],
+    example: `Deque<Integer> stack = new ArrayDeque<>();
+stack.push(1); stack.push(2); stack.push(3);
+System.out.println(stack.pop()); // 3`
+  },
+  Map: {
+    type: 'interface', full: 'java.util.Map<K,V>',
+    points: [
+      `Stores key-value pairs; keys are unique (by equals()/hashCode()), values may repeat.`,
+      `Does NOT extend Collection — its natural "elements" are entries, not single objects.`,
+      `Java 8+ functional default methods: getOrDefault, putIfAbsent, computeIfAbsent, merge, forEach.`,
+      `keySet(), values(), entrySet() return collection-views backed by the map.`
+    ],
+    qa: [
+      { q: `What's the efficient way to iterate a Map?`, a: `Via entrySet() — iterating keySet() and calling get(key) for every entry does a redundant lookup per entry.` },
+      { q: `What does map.merge(key, 1, Integer::sum) do if the key isn't present yet?`, a: `It simply inserts the value 1 — merge() only invokes the remapping function when the key already maps to a non-null value. This is a very common word-count interview gotcha.`, tricky: true }
+    ],
+    example: `Map<String,Integer> counts = new HashMap<>();
+for (String w : List.of("a","b","a","c","a")) {
+    counts.merge(w, 1, Integer::sum);
+}
+System.out.println(counts); // {a=3, b=1, c=1}`
+  },
+  HashMap: {
+    type: 'class', full: 'java.util.HashMap<K,V>',
+    points: [
+      `Array of buckets; hashCode() picks the bucket, equals() resolves collisions within it.`,
+      `O(1) average get/put; since Java 8, a bucket treeifies into a red-black tree (O(log n)) once it holds 8+ entries — never true O(n) worst case for those buckets.`,
+      `Allows one null key and multiple null values; iteration order is unspecified.`,
+      `Not synchronized — unsafe for concurrent modification.`
+    ],
+    qa: [
+      { q: `What happens on a hashCode collision?`, a: `Both entries land in the same bucket; equals() distinguishes them (stored as a short linked list, or a tree once the bucket is large enough).` },
+      { q: `Why does the default capacity/load-factor (16, 0.75) matter?`, a: `HashMap resizes (doubles) once size exceeds capacity × loadFactor. Resizing rehashes every entry — O(n) — which can hurt performance if you don't pre-size for a known large dataset.`, tricky: true }
+    ],
+    example: `Map<String,Integer> m = new HashMap<>();
+m.put(null, 1);          // one null key is allowed
+m.put("a", null);        // null values allowed too
+System.out.println(m.get(null)); // 1`
+  },
+  LinkedHashMap: {
+    type: 'class', full: 'java.util.LinkedHashMap<K,V>',
+    points: [
+      `Extends HashMap, threading a doubly linked list through entries to maintain order.`,
+      `Default mode: insertion order. Optional access-order mode (accessOrder=true) — the basis of a simple LRU cache.`,
+      `Slightly more overhead than HashMap; still O(1) average operations.`
+    ],
+    qa: [
+      { q: `How do you build an LRU cache with LinkedHashMap?`, a: `Construct it with accessOrder=true and override removeEldestEntry() to evict the least-recently-used entry once a size threshold is exceeded.` },
+      { q: `Does calling get() change iteration order in the default configuration?`, a: `No — only in access-order mode. By default it stays pure insertion order regardless of how many times you read an entry.`, tricky: true }
+    ],
+    example: `Map<Integer,String> lru = new LinkedHashMap<>(16, 0.75f, true) {
+    protected boolean removeEldestEntry(Map.Entry<Integer,String> e) {
+        return size() > 3;
+    }
+};
+lru.put(1,"a"); lru.put(2,"b"); lru.put(3,"c");
+lru.get(1);         // touches 1, moves it to most-recently-used
+lru.put(4,"d");     // evicts 2 (least recently used)
+System.out.println(lru.keySet()); // [3, 1, 4]`
+  },
+  Hashtable: {
+    type: 'class', full: 'java.util.Hashtable<K,V>',
+    points: [
+      `Legacy (pre-Java 2) synchronized Map implementation.`,
+      `Disallows both null keys and null values — throws NullPointerException.`,
+      `Every method is synchronized, creating meaningful contention overhead under concurrency.`,
+      `ConcurrentHashMap is the modern replacement for thread-safe maps.`
+    ],
+    qa: [
+      { q: `HashMap vs Hashtable — the two biggest differences?`, a: `Hashtable is synchronized and forbids nulls; HashMap is unsynchronized and allows one null key plus multiple null values.` },
+      { q: `Is Hashtable a good choice for high-concurrency code today?`, a: `No — its coarse per-method locking is far slower under contention than ConcurrentHashMap's finer-grained locking/CAS approach.`, tricky: true }
+    ],
+    example: `Hashtable<String,Integer> t = new Hashtable<>();
+t.put("a", 1);
+// t.put(null, 2); // throws NullPointerException`
+  },
+  SortedMap: {
+    type: 'interface', full: 'java.util.SortedMap<K,V>',
+    points: [
+      `Guarantees keys iterate in ascending order — natural order, or via a supplied Comparator.`,
+      `Adds firstKey(), lastKey(), and the range views headMap(), tailMap(), subMap().`,
+      `Extended by NavigableMap for closest-match lookups.`
+    ],
+    qa: [
+      { q: `What must map keys satisfy to be used in a SortedMap?`, a: `Mutual comparability — implement Comparable, or supply a Comparator at construction time.` },
+      { q: `Are headMap()/tailMap() boundary keys inclusive or exclusive?`, a: `headMap(toKey) is exclusive of toKey; tailMap(fromKey) is inclusive of fromKey — an easy detail to mix up.`, tricky: true }
+    ],
+    example: `SortedMap<Integer,String> m = new TreeMap<>();
+m.put(1,"a"); m.put(2,"b"); m.put(3,"c");
+System.out.println(m.headMap(2)); // {1=a}  (2 excluded)
+System.out.println(m.tailMap(2)); // {2=b, 3=c} (2 included)`
+  },
+  NavigableMap: {
+    type: 'interface', full: 'java.util.NavigableMap<K,V>',
+    points: [
+      `Extends SortedMap with floorKey/ceilingKey/higherKey/lowerKey and their Entry-returning counterparts.`,
+      `Adds pollFirstEntry()/pollLastEntry() (retrieve-and-remove) and descendingMap().`,
+      `TreeMap is its only implementation in the JDK.`
+    ],
+    qa: [
+      { q: `floorEntry() vs floorKey() — what's the difference?`, a: `floorKey() returns only the key; floorEntry() returns the whole Map.Entry (key + value) in one lookup.` },
+      { q: `What does ceilingKey(k) return when k itself is a key in the map?`, a: `k itself — like NavigableSet's ceiling, it's inclusive ("≥"), not strict.`, tricky: true }
+    ],
+    example: `NavigableMap<Integer,String> m = new TreeMap<>();
+m.put(10,"x"); m.put(20,"y"); m.put(30,"z");
+System.out.println(m.floorEntry(25)); // 20=y`
+  },
+  TreeMap: {
+    type: 'class', full: 'java.util.TreeMap<K,V>',
+    points: [
+      `Implements NavigableMap, backed by a Red-Black tree.`,
+      `O(log n) get/put/remove; keys iterate in sorted order.`,
+      `Keys must be mutually comparable; a null key throws NullPointerException (values may be null).`,
+      `Common for range queries, sorted iteration, or "closest key" lookups.`
+    ],
+    qa: [
+      { q: `When would you pick TreeMap over HashMap?`, a: `When you need sorted iteration order or range/closest-key queries, accepting O(log n) instead of HashMap's O(1) average.` },
+      { q: `Can TreeMap have a null key?`, a: `No (with natural ordering) — comparing to null throws NullPointerException. HashMap, by contrast, allows exactly one null key. Knowing which map allows null is a classic trap.`, tricky: true }
+    ],
+    example: `TreeMap<String,Integer> m = new TreeMap<>();
+m.put("banana", 2); m.put("apple", 1); m.put("cherry", 3);
+System.out.println(m); // {apple=1, banana=2, cherry=3} — sorted by key`
+  },
+  Iterator: {
+    type: 'interface', full: 'java.util.Iterator<E>',
+    points: [
+      `A uniform way to traverse any Collection forward-only: hasNext(), next(), optional remove().`,
+      `The only safe way to remove elements from a collection while iterating it.`,
+      `Most JDK iterators are "fail-fast" — they throw ConcurrentModificationException if the collection is structurally modified outside the iterator during iteration.`
+    ],
+    qa: [
+      { q: `Why does Iterator.remove() work but list.remove() inside a for-each throw?`, a: `Iterator.remove() updates the iterator's own expected modCount along with the collection's; a direct collection.remove() only updates the collection's modCount, causing a mismatch the iterator detects on the next next() call.` },
+      { q: `Is fail-fast behavior guaranteed by the JDK?`, a: `No — the docs explicitly call it "best effort" and warn it should never be relied on for correctness, only for surfacing bugs during development.`, tricky: true }
+    ],
+    example: `List<Integer> list = new ArrayList<>(List.of(1,2,3,4));
+Iterator<Integer> it = list.iterator();
+while (it.hasNext()) {
+    if (it.next() % 2 == 0) it.remove(); // safe removal
+}
+System.out.println(list); // [1, 3]`
+  },
+  ListIterator: {
+    type: 'interface', full: 'java.util.ListIterator<E>',
+    points: [
+      `Extends Iterator; adds backward traversal (hasPrevious/previous) and in-place modification (set(e), add(e)).`,
+      `Tracks a cursor position between elements; nextIndex()/previousIndex() report where it sits.`,
+      `Only available on List implementations — not on Set, Queue, or Map.`
+    ],
+    qa: [
+      { q: `What can ListIterator do that Iterator can't?`, a: `Traverse backwards, replace the last element returned via set(), and insert new elements via add() mid-iteration.` },
+      { q: `After calling next(), what does previous() return?`, a: `The same element you just received from next() — the cursor sits between elements, so previous() re-reads it rather than skipping back one further.`, tricky: true }
+    ],
+    example: `List<String> l = new ArrayList<>(List.of("a","b","c"));
+ListIterator<String> it = l.listIterator();
+while (it.hasNext()) {
+    String s = it.next();
+    if (s.equals("b")) it.set("B"); // in-place replace
+}
+System.out.println(l); // [a, B, c]`
+  },
+  Comparable: {
+    type: 'interface', full: 'java.lang.Comparable<T>',
+    points: [
+      `Defines a class's single "natural ordering" via compareTo(T o).`,
+      `Implemented by the class itself (intrusive) — e.g. String, Integer, and most wrapper types.`,
+      `Convention: the sign of compareTo() should be consistent with equals() — recommended, but not enforced by the compiler.`,
+      `Used automatically by Collections.sort(), TreeSet, and TreeMap when no Comparator is supplied.`
+    ],
+    qa: [
+      { q: `Comparable vs Comparator — what's the core difference?`, a: `Comparable defines one fixed ordering inside the class itself; Comparator defines an external, pluggable ordering (or several) without modifying the class.` },
+      { q: `Is it mandatory that compareTo() == 0 implies equals() == true?`, a: `No — strongly recommended, but not enforced. Violating it causes surprising behavior in sorted collections (see TreeSet, which treats compareTo() == 0 as a duplicate regardless of equals()).`, tricky: true }
+    ],
+    example: `class Person implements Comparable<Person> {
+    String name; int age;
+    public int compareTo(Person o) { return Integer.compare(age, o.age); }
+}`
+  },
+  Comparator: {
+    type: 'interface', full: 'java.util.Comparator<T>',
+    points: [
+      `Defines an external ordering via compare(T o1, T o2) without modifying the compared class.`,
+      `Java 8+ fluent helpers: comparing(), thenComparing(), reversed(), nullsFirst()/nullsLast().`,
+      `Multiple different Comparators can exist for the same class, unlike Comparable's single natural order.`,
+      `Used by Collections.sort(list, comparator), List.sort(), and stream().sorted(comparator).`
+    ],
+    qa: [
+      { q: `How do you sort by one field, then break ties with another?`, a: `Comparator.comparing(Person::getAge).thenComparing(Person::getName).` },
+      { q: `Does .reversed() on a chained comparator also reverse the thenComparing() tie-breaker?`, a: `No — reversed() only flips the comparator it's directly called on. If called before thenComparing() is chained on, the tie-breaker keeps its own ascending direction — a frequent source of subtly wrong sort output.`, tricky: true }
+    ],
+    example: `people.sort(
+    Comparator.comparing(Person::getAge).reversed()
+              .thenComparing(Person::getName)
+);`
+  },
+  Collections: {
+    type: 'class', full: 'java.util.Collections',
+    points: [
+      `Static utility class (every method is static) providing algorithms over Collections: sort, reverse, shuffle, min, max, binarySearch, frequency, swap.`,
+      `Provides wrapper factories: unmodifiableList/Set/Map, synchronizedList/Set/Map, and empty/singleton collections.`,
+      `binarySearch() requires the list to already be sorted — behavior is undefined otherwise.`,
+      `Not to be confused with the Collection interface (root of the hierarchy) — a very common naming mix-up.`
+    ],
+    qa: [
+      { q: `Why use Collections.unmodifiableList() instead of just promising not to mutate a list?`, a: `It gives a runtime-enforced read-only view you can hand to other code without trusting it — any mutation attempt throws UnsupportedOperationException.` },
+      { q: `Does Collections.unmodifiableList() protect against changes to the underlying list?`, a: `No — it's just a read-only view. If the original backing list is mutated directly, the "unmodifiable" view reflects those changes too. It blocks mutation through the view, not mutation of the source.`, tricky: true }
+    ],
+    example: `List<Integer> mutable = new ArrayList<>(List.of(3,1,2));
+List<Integer> view = Collections.unmodifiableList(mutable);
+mutable.add(4);
+System.out.println(view); // [3, 1, 2, 4] — view reflects the change!
+// view.add(5); // throws UnsupportedOperationException`
+  }
+};
+
+const METHODS = {
+  Collection__add: { type:'method', name:'add(e)', full:'Collection.add(E e)',
+    points:[`Appends the element to the collection; returns true if the collection changed as a result.`,
+             `Set implementations return false instead of adding when the element is already present.`],
+    qa:[{q:`Does add() always return true?`, a:`Not always — List implementations always return true, but Set implementations return false when the element is a duplicate and nothing was added. Checking the return value is an easy way to detect a no-op insert.`, tricky:true}],
+    example:`List<Integer> l = new ArrayList<>();
+System.out.println(l.add(1)); // true
+Set<Integer> s = new HashSet<>();
+s.add(1);
+System.out.println(s.add(1)); // false — duplicate` },
+
+  Collection__remove: { type:'method', name:'remove(o)', full:'Collection.remove(Object o)',
+    points:[`Removes a single instance of the given element (matched via equals()), if present.`,
+             `Returns true only if an element was actually removed.`],
+    qa:[{q:`On a List<Integer>, does list.remove(2) remove the value 2 or the element at index 2?`, a:`It removes by INDEX — remove(int) is a separate overload from remove(Object). Calling remove(2) with an int literal picks the index overload; wrapping it as remove(Integer.valueOf(2)) picks the object/value overload instead.`, tricky:true}],
+    example:`List<Integer> l = new ArrayList<>(List.of(10,20,30));
+l.remove(1);                    // int -> removes by INDEX -> [10, 30]
+l.remove(Integer.valueOf(10));  // Integer -> removes by VALUE -> [30]` },
+
+  Collection__size: { type:'method', name:'size()', full:'Collection.size()',
+    points:[`Returns the number of elements currently in the collection.`,
+             `O(1) for virtually every JDK collection — they maintain a running count rather than counting on each call.`],
+    qa:[{q:`Is size() ever O(n)?`, a:`Not for standard JDK collections — they cache a count field. It could be O(n) for a custom Collection implementation that computes size by walking its structure, though that would be unusual.`}],
+    example:`System.out.println(new ArrayList<>(List.of(1,2,3)).size()); // 3` },
+
+  Collection__isEmpty: { type:'method', name:'isEmpty()', full:'Collection.isEmpty()',
+    points:[`Equivalent to size() == 0, but reads more clearly and doesn't rely on knowing the internal count.`,
+             `Available on every Collection and Map.`],
+    qa:[{q:`Is list.isEmpty() faster than list.size() == 0?`, a:`Functionally the same performance for JDK collections (both O(1)) — isEmpty() is preferred purely for readability.`}],
+    example:`List<Integer> l = new ArrayList<>();
+System.out.println(l.isEmpty()); // true` },
+
+  Collection__contains: { type:'method', name:'contains(o)', full:'Collection.contains(Object o)',
+    points:[`Returns true if the collection contains an element equal (via equals()) to o.`,
+             `O(1) average for HashSet/HashMap-backed collections, O(log n) for TreeSet, O(n) for List implementations.`],
+    qa:[{q:`Why is contains() O(n) on a List but O(1) average on a HashSet?`, a:`A List has no index structure — contains() must linearly scan and compare with equals(). A HashSet computes hashCode() to jump straight to the right bucket.`, tricky:true}],
+    example:`System.out.println(List.of(1,2,3).contains(2)); // true — O(n) scan` },
+
+  Collection__clear: { type:'method', name:'clear()', full:'Collection.clear()',
+    points:[`Removes all elements, leaving size() == 0.`,
+             `On a view (like subList() or keySet()), clear() removes those elements from the backing collection too.`],
+    qa:[{q:`If you call list.subList(1,3).clear(), what happens to the original list?`, a:`The corresponding elements are removed from the original list too — subList() is a view, not a copy, so structural changes propagate both ways.`, tricky:true}],
+    example:`List<Integer> l = new ArrayList<>(List.of(1,2,3,4,5));
+l.subList(1,3).clear();
+System.out.println(l); // [1, 4, 5]` },
+
+  Collection__iterator: { type:'method', name:'iterator()', full:'Collection.iterator()',
+    points:[`Returns an Iterator positioned before the first element, for one-time forward traversal.`,
+             `The returned iterator is fail-fast for standard JDK collections.`],
+    qa:[{q:`Can you reuse the same Iterator after a full traversal finishes?`, a:`No — once hasNext() returns false you must call iterator() again to get a fresh one; Iterator has no reset().`}],
+    example:`Iterator<Integer> it = List.of(1,2,3).iterator();
+while (it.hasNext()) System.out.print(it.next());` },
+
+  Collection__addAll: { type:'method', name:'addAll(c)', full:'Collection.addAll(Collection<? extends E> c)',
+    points:[`Adds every element of the given collection to this one; returns true if this collection changed.`,
+             `More efficient than looping and calling add() repeatedly for many implementations.`],
+    qa:[{q:`What happens if you call list.addAll(list) — pass the collection to itself?`, a:`It's well-defined but easy to get wrong mentally — it duplicates every current element once, doubling the list, since the source is iterated as elements are appended.`, tricky:true}],
+    example:`List<Integer> a = new ArrayList<>(List.of(1,2));
+a.addAll(List.of(3,4));
+System.out.println(a); // [1, 2, 3, 4]` },
+
+  Collection__removeAll: { type:'method', name:'removeAll(c)', full:'Collection.removeAll(Collection<?> c)',
+    points:[`Removes every element that also appears in the given collection (set difference).`,
+             `Returns true if this collection was modified.`],
+    qa:[{q:`Does removeAll() remove just one occurrence, or every occurrence, of a matching element?`, a:`Every occurrence of each matching element is removed — different from remove(Object), which removes only a single instance.`, tricky:true}],
+    example:`List<Integer> a = new ArrayList<>(List.of(1,2,2,3));
+a.removeAll(List.of(2));
+System.out.println(a); // [1, 3] — both 2s removed` },
+
+  Collection__retainAll: { type:'method', name:'retainAll(c)', full:'Collection.retainAll(Collection<?> c)',
+    points:[`Keeps only the elements that are also in the given collection — a set intersection.`,
+             `Mutates the receiver in place and returns a boolean indicating whether it changed.`],
+    qa:[{q:`Does retainAll() return a new intersected collection?`, a:`No — it mutates the receiver in place; there's no functional-style intersection() that returns a fresh collection.`, tricky:true}],
+    example:`List<Integer> a = new ArrayList<>(List.of(1,2,3,4));
+a.retainAll(List.of(2,4,6));
+System.out.println(a); // [2, 4]` },
+
+  Collection__toArray: { type:'method', name:'toArray()', full:'Collection.toArray()',
+    points:[`Returns a new Object[] snapshot — changes to the array don't affect the collection.`,
+             `The typed overload toArray(T[] a) (or toArray(IntFunction) in modern Java) avoids an unchecked cast to get a properly typed array.`],
+    qa:[{q:`Why does list.toArray() return Object[] even for a List<String>?`, a:`Generics are erased at runtime, so plain toArray() can't know the element type. Use toArray(new String[0]) or toArray(String[]::new) to get a correctly typed array.`, tricky:true}],
+    example:`List<String> l = List.of("a","b");
+String[] arr = l.toArray(new String[0]);` },
+
+  Collection__stream: { type:'method', name:'stream()', full:'Collection.stream()',
+    points:[`Returns a sequential Stream<E> for use with filter/map/collect and friends.`,
+             `parallelStream() is the equivalent for a (potentially) parallel stream.`],
+    qa:[{q:`Does calling stream() consume or copy the collection?`, a:`Neither — it's a lazy view; nothing happens until a terminal operation like collect() or forEach() is invoked.`}],
+    example:`long count = List.of(1,2,3,4).stream().filter(n -> n % 2 == 0).count();
+System.out.println(count); // 2` },
+
+  List__get: { type:'method', name:'get(i)', full:'List.get(int index)',
+    points:[`Returns the element at the given 0-based index.`,
+             `O(1) for ArrayList/array-backed lists, O(n) for LinkedList (must walk from an end).`],
+    qa:[{q:`What exception does get() throw for an out-of-range index?`, a:`IndexOutOfBoundsException — not NullPointerException, even though ArrayList uses a raw array internally.`, tricky:true}],
+    example:`List<String> l = List.of("a","b","c");
+System.out.println(l.get(1)); // b` },
+
+  List__set: { type:'method', name:'set(i,e)', full:'List.set(int index, E element)',
+    points:[`Replaces the element at the given index and returns the previous value.`,
+             `Does NOT change the list's size — unlike add(i,e), which inserts a new slot.`],
+    qa:[{q:`set(i,e) vs add(i,e) — what's the key difference?`, a:`set() overwrites an existing slot (size unchanged); add() inserts a new slot, shifting everything after it and increasing size by one.`, tricky:true}],
+    example:`List<String> l = new ArrayList<>(List.of("a","b","c"));
+String old = l.set(1, "B");
+System.out.println(old + " " + l); // b [a, B, c]` },
+
+  List__addAt: { type:'method', name:'add(i,e)', full:'List.add(int index, E element)',
+    points:[`Inserts the element at the given index, shifting subsequent elements right.`,
+             `O(n) for ArrayList (array shift); O(1) at the ends for LinkedList, O(n) elsewhere.`],
+    qa:[{q:`What happens if index equals list.size()?`, a:`It's valid — inserting at index == size() appends to the end, same as add(e). Anything beyond that throws IndexOutOfBoundsException.`}],
+    example:`List<String> l = new ArrayList<>(List.of("a","c"));
+l.add(1, "b");
+System.out.println(l); // [a, b, c]` },
+
+  List__removeAt: { type:'method', name:'remove(i)', full:'List.remove(int index)',
+    points:[`Removes and returns the element at the given index, shifting subsequent elements left.`,
+             `This is the overload chosen when you pass a primitive int (see the int-vs-Integer trap on remove(o)).`],
+    qa:[{q:`Does remove(int index) return the removed element or a boolean?`, a:`It returns the removed element (E) — different from remove(Object), which returns a boolean.`, tricky:true}],
+    example:`List<String> l = new ArrayList<>(List.of("a","b","c"));
+String removed = l.remove(1);
+System.out.println(removed + " " + l); // b [a, c]` },
+
+  List__indexOf: { type:'method', name:'indexOf(o)', full:'List.indexOf(Object o)',
+    points:[`Returns the index of the first occurrence of o (via equals()), or -1 if not found.`,
+             `lastIndexOf(o) is the mirror version searching from the end.`],
+    qa:[{q:`How efficient is indexOf() on a LinkedList vs an ArrayList?`, a:`Both are O(n) — ArrayList scans the backing array, LinkedList walks node-by-node; neither has an index structure to speed this up.`}],
+    example:`List<String> l = List.of("a","b","c","b");
+System.out.println(l.indexOf("b")); // 1` },
+
+  List__lastIndexOf: { type:'method', name:'lastIndexOf(o)', full:'List.lastIndexOf(Object o)',
+    points:[`Returns the index of the last occurrence of o, or -1 if absent.`,
+             `Useful for finding the most recent match when duplicates exist.`],
+    qa:[{q:`Is lastIndexOf() faster than scanning from the front yourself?`, a:`No — it's still an O(n) linear scan under the hood, just packaged conveniently.`}],
+    example:`List<String> l = List.of("a","b","c","b");
+System.out.println(l.lastIndexOf("b")); // 3` },
+
+  List__subList: { type:'method', name:'subList(from,to)', full:'List.subList(int fromIndex, int toIndex)',
+    points:[`Returns a view (not a copy) of the range [fromIndex, toIndex) backed by the original list.`,
+             `Structural changes to the sublist affect the parent list, and vice versa.`],
+    qa:[{q:`What happens if you structurally modify the parent list directly while holding a sublist reference?`, a:`The sublist view becomes invalid — any further operation on it throws ConcurrentModificationException, the same fail-fast protection as an Iterator.`, tricky:true}],
+    example:`List<Integer> l = new ArrayList<>(List.of(1,2,3,4,5));
+List<Integer> view = l.subList(1,4);
+view.set(0, 99);
+System.out.println(l); // [1, 99, 3, 4, 5] — parent changed too` },
+
+  List__listIterator: { type:'method', name:'listIterator()', full:'List.listIterator()',
+    points:[`Returns a ListIterator positioned before the first element, supporting bidirectional traversal and in-place add/set/remove.`,
+             `An overload listIterator(int index) starts the cursor at a given position.`],
+    qa:[{q:`Why use listIterator() instead of iterator()?`, a:`When you need to traverse backwards, replace elements in place with set(), or insert new elements mid-traversal with add() — none of which the plain Iterator interface supports.`}],
+    example:`ListIterator<String> it = new ArrayList<>(List.of("a","b")).listIterator();
+it.next(); it.add("X"); // inserts between a and b` },
+
+  ArrayList__ensureCapacity: { type:'method', name:'ensureCapacity(n)', full:'ArrayList.ensureCapacity(int minCapacity)',
+    points:[`Pre-grows the backing array to at least the given capacity, avoiding multiple incremental resizes.`,
+             `Purely a performance hint — doesn't change size() or contents.`],
+    qa:[{q:`When is ensureCapacity() worth calling explicitly?`, a:`When you know roughly how many elements you're about to bulk-add — it avoids repeated array copies during growth in a hot loop.`}],
+    example:`ArrayList<Integer> l = new ArrayList<>();
+l.ensureCapacity(10_000); // pre-size before a big loop of add()` },
+
+  ArrayList__trimToSize: { type:'method', name:'trimToSize()', full:'ArrayList.trimToSize()',
+    points:[`Shrinks the backing array's capacity down to the current size(), releasing unused slots.`,
+             `Useful after removing many elements from a list you intend to keep around long-term.`],
+    qa:[{q:`Does trimToSize() affect size() or contents?`, a:`No — only the internal array's spare capacity is reclaimed; size() and all elements stay exactly the same.`}],
+    example:`ArrayList<Integer> l = new ArrayList<>(1000);
+l.add(1);
+l.trimToSize(); // shrink backing array from capacity 1000 down to 1` },
+
+  ArrayList__clone: { type:'method', name:'clone()', full:'ArrayList.clone()',
+    points:[`Returns a shallow copy: a new ArrayList with the same elements (references), not deep-copied objects.`,
+             `Generally discouraged in modern code — prefer new ArrayList<>(original), which is clearer and type-safe.`],
+    qa:[{q:`Does clone() deep-copy the elements inside the list?`, a:`No — it's a shallow copy. The new list holds references to the exact same element objects; mutating a shared mutable element affects both lists.`, tricky:true}],
+    example:`ArrayList<int[]> a = new ArrayList<>(List.of(new int[]{1,2}));
+ArrayList<int[]> b = (ArrayList<int[]>) a.clone();
+b.get(0)[0] = 99;
+System.out.println(a.get(0)[0]); // 99 — same array instance, shallow copy!` },
+
+  LinkedList__removeFirst: { type:'method', name:'removeFirst()', full:'LinkedList.removeFirst()',
+    points:[`Removes and returns the first element; throws NoSuchElementException if the list is empty.`,
+             `pollFirst() is the non-throwing Deque equivalent, returning null instead.`],
+    qa:[{q:`removeFirst() vs pollFirst() on an empty LinkedList — what's the difference?`, a:`removeFirst() throws NoSuchElementException on empty; pollFirst() returns null instead — the same throwing/non-throwing pairing seen across Queue/Deque.`, tricky:true}],
+    example:`LinkedList<Integer> l = new LinkedList<>(List.of(1,2,3));
+System.out.println(l.removeFirst()); // 1` },
+
+  LinkedList__removeLast: { type:'method', name:'removeLast()', full:'LinkedList.removeLast()',
+    points:[`Removes and returns the last element; throws NoSuchElementException if empty.`,
+             `O(1) — LinkedList keeps a direct reference to its tail node.`],
+    qa:[{q:`Is removeLast() O(1) or O(n)?`, a:`O(1) — LinkedList is doubly linked with a tail pointer, so no traversal is needed regardless of list length.`}],
+    example:`LinkedList<Integer> l = new LinkedList<>(List.of(1,2,3));
+System.out.println(l.removeLast()); // 3` },
+
+  LinkedList__getFirst: { type:'method', name:'getFirst()', full:'LinkedList.getFirst()',
+    points:[`Returns (without removing) the first element; throws NoSuchElementException if empty.`,
+             `peekFirst() is the corresponding non-throwing form.`],
+    qa:[{q:`getFirst() vs peek() — any difference on a LinkedList?`, a:`peek() (from Queue) is equivalent to peekFirst() and returns null on empty; getFirst() throws NoSuchElementException instead — same value, different failure mode.`}],
+    example:`LinkedList<Integer> l = new LinkedList<>(List.of(1,2,3));
+System.out.println(l.getFirst()); // 1 (list unchanged)` },
+
+  LinkedList__getLast: { type:'method', name:'getLast()', full:'LinkedList.getLast()',
+    points:[`Returns (without removing) the last element; throws NoSuchElementException if empty.`,
+             `O(1) via the tail pointer.`],
+    qa:[{q:`Is there a Queue-style non-throwing equivalent for getLast()?`, a:`Not through Queue (which only exposes the head), but Deque's peekLast() gives the same non-throwing behavior.`}],
+    example:`LinkedList<Integer> l = new LinkedList<>(List.of(1,2,3));
+System.out.println(l.getLast()); // 3` },
+
+  Vector__addElement: { type:'method', name:'addElement(e)', full:'Vector.addElement(E obj)',
+    points:[`Legacy equivalent of add(e) — appends to the end and returns void, not boolean.`,
+             `Synchronized, like every other Vector method.`],
+    qa:[{q:`Why do legacy addElement() and modern add() coexist on Vector?`, a:`Vector predates the Collections Framework (JDK 1.0); add() was retrofitted when Vector was made to implement List in Java 2, so both APIs remain for backward compatibility.`}],
+    example:`Vector<String> v = new Vector<>();
+v.addElement("x"); // legacy style
+v.add("y");        // List style — both work` },
+
+  Vector__elementAt: { type:'method', name:'elementAt(i)', full:'Vector.elementAt(int index)',
+    points:[`Legacy equivalent of get(i).`,
+             `Throws ArrayIndexOutOfBoundsException on an invalid index (a subclass of IndexOutOfBoundsException).`],
+    qa:[{q:`Does elementAt() throw a different exception type than get()?`, a:`Vector's legacy methods throw ArrayIndexOutOfBoundsException; get() (added later for List) throws IndexOutOfBoundsException directly. Catching the parent type covers both.`, tricky:true}],
+    example:`Vector<String> v = new Vector<>(List.of("a","b"));
+System.out.println(v.elementAt(0)); // a` },
+
+  Vector__firstElement: { type:'method', name:'firstElement()', full:'Vector.firstElement()',
+    points:[`Legacy equivalent of get(0).`,
+             `Throws NoSuchElementException if the vector is empty.`],
+    qa:[{q:`Is firstElement() equivalent to List.getFirst() (added in Java 21)?`, a:`Functionally yes for a non-empty Vector — both return the first element and throw when empty; firstElement() is just the older, pre-Collections-Framework name.`}],
+    example:`Vector<String> v = new Vector<>(List.of("a","b"));
+System.out.println(v.firstElement()); // a` },
+
+  Vector__lastElement: { type:'method', name:'lastElement()', full:'Vector.lastElement()',
+    points:[`Legacy equivalent of get(size()-1).`,
+             `Throws NoSuchElementException if the vector is empty.`],
+    qa:[{q:`Is there a risk in calling lastElement() without checking isEmpty() first?`, a:`Yes — an empty Vector throws NoSuchElementException, so defensive code should check isEmpty() (or catch the exception) first.`}],
+    example:`Vector<String> v = new Vector<>(List.of("a","b","c"));
+System.out.println(v.lastElement()); // c` },
+
+  Stack__push: { type:'method', name:'push(e)', full:'Stack.push(E item)',
+    points:[`Adds an element to the top of the stack and returns it.`,
+             `Internally calls addElement(e) (inherited from Vector) — the Vector's tail is treated as the 'top'.`],
+    qa:[{q:`Where in the underlying Vector does push() actually insert?`, a:`At the end of the Vector's internal array — Stack treats the tail as 'top', which is why push/pop are both O(1) amortized.`}],
+    example:`Stack<Integer> s = new Stack<>();
+s.push(1); s.push(2);
+System.out.println(s); // [1, 2] — top is the last element` },
+
+  Stack__pop: { type:'method', name:'pop()', full:'Stack.pop()',
+    points:[`Removes and returns the top element (LIFO).`,
+             `Throws EmptyStackException — not NoSuchElementException — if the stack is empty.`],
+    qa:[{q:`What exception does pop() throw on an empty Stack?`, a:`EmptyStackException, a Stack-specific RuntimeException — different from the NoSuchElementException thrown by Queue/Deque's throwing methods.`, tricky:true}],
+    example:`Stack<Integer> s = new Stack<>();
+s.push(1);
+System.out.println(s.pop()); // 1
+// s.pop(); // throws EmptyStackException` },
+
+  Stack__peek: { type:'method', name:'peek()', full:'Stack.peek()',
+    points:[`Returns (without removing) the top element.`,
+             `Also throws EmptyStackException when the stack is empty, same as pop().`],
+    qa:[{q:`Stack.peek() vs Queue.peek() — same behavior?`, a:`No — Stack.peek() looks at the most-recently-pushed element (top of stack), while Queue.peek() looks at the head of the queue (oldest element). Same name, opposite ends conceptually.`, tricky:true}],
+    example:`Stack<Integer> s = new Stack<>();
+s.push(1); s.push(2);
+System.out.println(s.peek()); // 2, stack unchanged` },
+
+  Stack__empty: { type:'method', name:'empty()', full:'Stack.empty()',
+    points:[`Returns true if the stack has no elements — Stack's own naming predates isEmpty().`,
+             `Functionally identical to the inherited Collection.isEmpty().`],
+    qa:[{q:`empty() vs isEmpty() on a Stack — any difference?`, a:`None functionally — empty() is Stack's original pre-Collections-Framework method name; isEmpty() is the inherited standard method. Both work identically.`}],
+    example:`Stack<Integer> s = new Stack<>();
+System.out.println(s.empty()); // true` },
+
+  Stack__search: { type:'method', name:'search(o)', full:'Stack.search(Object o)',
+    points:[`Returns the 1-based distance from the top of the stack to the first occurrence of o, or -1 if not found.`,
+             `Unusual among JDK collection methods for being 1-indexed rather than 0-indexed.`],
+    qa:[{q:`If the top element matches search(o), what does it return?`, a:`1 — not 0. search() counts distance-from-top starting at 1, unlike almost every other position-returning method in the JDK.`, tricky:true}],
+    example:`Stack<String> s = new Stack<>();
+s.push("a"); s.push("b"); s.push("c");
+System.out.println(s.search("c")); // 1 (top of stack)
+System.out.println(s.search("a")); // 3` },
+
+  SortedSet__first: { type:'method', name:'first()', full:'SortedSet.first()',
+    points:[`Returns the smallest element according to the set's ordering.`,
+             `Throws NoSuchElementException if the set is empty.`],
+    qa:[{q:`Is first() O(1) on a TreeSet?`, a:`It's O(log n) in the worst case, descending to the leftmost tree node — the JDK doesn't guarantee O(1) even though it's fast in practice.`}],
+    example:`SortedSet<Integer> s = new TreeSet<>(List.of(5,1,9));
+System.out.println(s.first()); // 1` },
+
+  SortedSet__last: { type:'method', name:'last()', full:'SortedSet.last()',
+    points:[`Returns the largest element according to the set's ordering.`,
+             `Throws NoSuchElementException if the set is empty.`],
+    qa:[{q:`Does last() re-sort the set to find the maximum?`, a:`No — the set is already maintained in sorted order at all times; last() just navigates to the rightmost node.`}],
+    example:`SortedSet<Integer> s = new TreeSet<>(List.of(5,1,9));
+System.out.println(s.last()); // 9` },
+
+  SortedSet__headSet: { type:'method', name:'headSet(to)', full:'SortedSet.headSet(E toElement)',
+    points:[`Returns a view of elements strictly less than toElement.`,
+             `The boundary toElement is EXCLUDED from the result.`],
+    qa:[{q:`Is toElement included in headSet(toElement)?`, a:`No — headSet() is exclusive of its boundary. Use a NavigableSet's methods if you need an inclusive variant.`, tricky:true}],
+    example:`SortedSet<Integer> s = new TreeSet<>(List.of(1,3,5,7));
+System.out.println(s.headSet(5)); // [1, 3] — 5 excluded` },
+
+  SortedSet__tailSet: { type:'method', name:'tailSet(from)', full:'SortedSet.tailSet(E fromElement)',
+    points:[`Returns a view of elements greater than or equal to fromElement.`,
+             `The boundary fromElement IS included — asymmetric with headSet()'s exclusive boundary.`],
+    qa:[{q:`Are headSet() and tailSet() boundaries symmetric?`, a:`No — headSet(to) is exclusive of 'to', tailSet(from) is inclusive of 'from'. Together they partition the set with no overlap and no gap.`, tricky:true}],
+    example:`SortedSet<Integer> s = new TreeSet<>(List.of(1,3,5,7));
+System.out.println(s.tailSet(5)); // [5, 7] — 5 included` },
+
+  SortedSet__subSet: { type:'method', name:'subSet(from,to)', full:'SortedSet.subSet(E fromElement, E toElement)',
+    points:[`Returns a view of elements in the half-open range [fromElement, toElement).`,
+             `Equivalent to combining tailSet(from) and headSet(to).`],
+    qa:[{q:`Is subSet(from, to) inclusive or exclusive of 'to'?`, a:`Exclusive — same convention as headSet(), matching half-open range conventions elsewhere in the JDK (like String.substring()).`}],
+    example:`SortedSet<Integer> s = new TreeSet<>(List.of(1,3,5,7,9));
+System.out.println(s.subSet(3,9)); // [3, 5, 7]` },
+
+  NavigableSet__floor: { type:'method', name:'floor(e)', full:'NavigableSet.floor(E e)',
+    points:[`Returns the greatest element ≤ e, or null if none exists.`,
+             `Inclusive of e itself if e is present in the set.`],
+    qa:[{q:`What does floor(e) return if e is smaller than every element?`, a:`null — there's no element ≤ e. All four navigation methods (floor/ceiling/higher/lower) return null instead of throwing on a miss.`, tricky:true}],
+    example:`NavigableSet<Integer> s = new TreeSet<>(List.of(10,20,30));
+System.out.println(s.floor(25)); // 20` },
+
+  NavigableSet__ceiling: { type:'method', name:'ceiling(e)', full:'NavigableSet.ceiling(E e)',
+    points:[`Returns the smallest element ≥ e, or null if none exists.`,
+             `Inclusive of e itself if present — the counterpart to floor().`],
+    qa:[{q:`ceiling(e) when e is exactly in the set — inclusive or exclusive?`, a:`Inclusive — it returns e itself. For strictly-greater-than, use higher(e) instead.`, tricky:true}],
+    example:`NavigableSet<Integer> s = new TreeSet<>(List.of(10,20,30));
+System.out.println(s.ceiling(20)); // 20` },
+
+  NavigableSet__higher: { type:'method', name:'higher(e)', full:'NavigableSet.higher(E e)',
+    points:[`Returns the smallest element strictly greater than e, or null if none exists.`,
+             `Unlike ceiling(), never returns e itself even if e is present.`],
+    qa:[{q:`higher(e) vs ceiling(e) when e is in the set — what's the output difference?`, a:`ceiling(e) returns e itself; higher(e) skips past e to the next element up. The single most commonly confused pair in NavigableSet interviews.`, tricky:true}],
+    example:`NavigableSet<Integer> s = new TreeSet<>(List.of(10,20,30));
+System.out.println(s.higher(20)); // 30` },
+
+  NavigableSet__lower: { type:'method', name:'lower(e)', full:'NavigableSet.lower(E e)',
+    points:[`Returns the greatest element strictly less than e, or null if none exists.`,
+             `The strict counterpart to floor(), mirroring higher()/ceiling().`],
+    qa:[{q:`lower(e) vs floor(e) — same relationship as higher vs ceiling?`, a:`Yes — floor() is inclusive (can return e), lower() is strict (never returns e), exactly mirroring ceiling()/higher().`}],
+    example:`NavigableSet<Integer> s = new TreeSet<>(List.of(10,20,30));
+System.out.println(s.lower(20)); // 10` },
+
+  NavigableSet__pollFirst: { type:'method', name:'pollFirst()', full:'NavigableSet.pollFirst()',
+    points:[`Retrieves AND removes the smallest element in one call; returns null if the set is empty.`,
+             `Combines first() + remove() into one operation.`],
+    qa:[{q:`Does pollFirst() throw on an empty set like first() does?`, a:`No — 'poll' methods across the JDK return null on empty instead of throwing, unlike first()/last().`, tricky:true}],
+    example:`NavigableSet<Integer> s = new TreeSet<>(List.of(3,1,2));
+System.out.println(s.pollFirst()); // 1
+System.out.println(s); // [2, 3]` },
+
+  NavigableSet__pollLast: { type:'method', name:'pollLast()', full:'NavigableSet.pollLast()',
+    points:[`Retrieves AND removes the largest element in one call; returns null if the set is empty.`,
+             `Useful for repeatedly draining a set from the top.`],
+    qa:[{q:`Could pollFirst()/pollLast() drain a TreeSet in sorted order?`, a:`Yes — repeatedly calling pollFirst() until it returns null gives every element in ascending order while emptying the set.`}],
+    example:`NavigableSet<Integer> s = new TreeSet<>(List.of(3,1,2));
+System.out.println(s.pollLast()); // 3` },
+
+  NavigableSet__descendingSet: { type:'method', name:'descendingSet()', full:'NavigableSet.descendingSet()',
+    points:[`Returns a reverse-ordered view of the set (largest first), backed by the same data.`,
+             `Changes to either the original set or the descending view are reflected in both.`],
+    qa:[{q:`Is descendingSet() a copy, making iteration slower than the original?`, a:`It's a view, not a copy — no data is duplicated; iteration cost is essentially the same, just traversing in the opposite direction.`}],
+    example:`NavigableSet<Integer> s = new TreeSet<>(List.of(1,2,3));
+System.out.println(s.descendingSet()); // [3, 2, 1]` },
+
+  Queue__offer: { type:'method', name:'offer(e)', full:'Queue.offer(E e)',
+    points:[`Inserts the element, returning false instead of throwing if the queue is capacity-restricted and full.`,
+             `For unbounded queues (LinkedList, PriorityQueue), offer() and add() behave identically.`],
+    qa:[{q:`offer(e) vs add(e) — when does the difference actually matter?`, a:`Only for capacity-bounded queues — add() throws IllegalStateException when full, offer() just returns false. For unbounded queues there's no practical difference.`, tricky:true}],
+    example:`Queue<Integer> q = new LinkedList<>();
+q.offer(1); q.offer(2);
+System.out.println(q); // [1, 2]` },
+
+  Queue__poll: { type:'method', name:'poll()', full:'Queue.poll()',
+    points:[`Retrieves and removes the head of the queue, returning null if empty.`,
+             `The non-throwing counterpart to remove().`],
+    qa:[{q:`On a PriorityQueue, does poll() return elements in insertion order or priority order?`, a:`Priority order — poll() always removes the current smallest (or highest-priority) element, regardless of insertion time.`, tricky:true}],
+    example:`Queue<Integer> q = new LinkedList<>(List.of(1,2,3));
+System.out.println(q.poll()); // 1` },
+
+  Queue__peek: { type:'method', name:'peek()', full:'Queue.peek()',
+    points:[`Returns (without removing) the head of the queue, or null if empty.`,
+             `On a PriorityQueue, this is the current minimum/highest-priority element.`],
+    qa:[{q:`Does peek() on an empty Queue throw, like Stack.peek() does?`, a:`No — Queue.peek() returns null on empty, following the poll/peek 'non-throwing' family, unlike Stack's peek() which throws EmptyStackException.`, tricky:true}],
+    example:`Queue<Integer> q = new LinkedList<>(List.of(5,1,3));
+System.out.println(q.peek()); // 5 (head, unchanged)` },
+
+  Queue__element: { type:'method', name:'element()', full:'Queue.element()',
+    points:[`Returns (without removing) the head of the queue; throws NoSuchElementException if empty.`,
+             `The throwing counterpart to peek(), analogous to remove() vs poll().`],
+    qa:[{q:`element() vs peek() — what's the difference?`, a:`Identical result on a non-empty queue; element() throws on empty, peek() returns null — same throwing/non-throwing pairing as add/offer and remove/poll.`}],
+    example:`Queue<Integer> q = new LinkedList<>(List.of(1,2));
+System.out.println(q.element()); // 1` },
+
+  Queue__remove: { type:'method', name:'remove()', full:'Queue.remove()',
+    points:[`Retrieves and removes the head of the queue; throws NoSuchElementException if empty.`,
+             `Distinct from Collection.remove(Object) — this no-arg overload always targets the head.`],
+    qa:[{q:`Queue.remove() vs Collection.remove(o) — are they related?`, a:`They're overloads that just share a name: no-arg Queue.remove() always removes the head; one-arg Collection.remove(o) searches for and removes a matching element. Easy to conflate in interviews.`, tricky:true}],
+    example:`Queue<Integer> q = new LinkedList<>(List.of(1,2,3));
+System.out.println(q.remove()); // 1 (removes head)` },
+
+  Deque__addFirst: { type:'method', name:'addFirst(e)', full:'Deque.addFirst(E e)',
+    points:[`Inserts the element at the front of the deque.`,
+             `Throws IllegalStateException on a capacity-restricted, full deque — offerFirst() is the non-throwing version.`],
+    qa:[{q:`addFirst() vs offerFirst() — same throwing/non-throwing split as elsewhere?`, a:`Yes — addFirst() throws on failure, offerFirst() returns false. Since ArrayDeque is unbounded, this rarely bites in practice.`}],
+    example:`Deque<Integer> d = new ArrayDeque<>();
+d.addFirst(1); d.addFirst(2);
+System.out.println(d); // [2, 1]` },
+
+  Deque__addLast: { type:'method', name:'addLast(e)', full:'Deque.addLast(E e)',
+    points:[`Inserts the element at the end of the deque — equivalent to add(e) on a Deque.`,
+             `Throws IllegalStateException on a full, capacity-restricted deque.`],
+    qa:[{q:`Is addLast(e) the same as calling add(e) on a Deque?`, a:`Yes — Deque.add(e) is specified to behave identically to addLast(e).`}],
+    example:`Deque<Integer> d = new ArrayDeque<>();
+d.addLast(1); d.addLast(2);
+System.out.println(d); // [1, 2]` },
+
+  Deque__offerFirst: { type:'method', name:'offerFirst(e)', full:'Deque.offerFirst(E e)',
+    points:[`Inserts at the front, returning false instead of throwing if the deque is full.`,
+             `On ArrayDeque (unbounded), always succeeds and returns true.`],
+    qa:[{q:`Can offerFirst() ever return false on an ArrayDeque?`, a:`Practically no — ArrayDeque has no fixed capacity limit, so offerFirst() always succeeds; the false path only matters for bounded implementations.`}],
+    example:`Deque<Integer> d = new ArrayDeque<>();
+System.out.println(d.offerFirst(1)); // true` },
+
+  Deque__offerLast: { type:'method', name:'offerLast(e)', full:'Deque.offerLast(E e)',
+    points:[`Inserts at the end, returning false instead of throwing if the deque is full.`,
+             `Equivalent to offer(e) on a Deque used as a Queue.`],
+    qa:[{q:`Is offerLast(e) the same as offer(e) on a Deque?`, a:`Yes — when a Deque is used through the Queue interface, offer(e) is defined to behave like offerLast(e).`}],
+    example:`Deque<Integer> d = new ArrayDeque<>();
+d.offerLast(1); d.offerLast(2);
+System.out.println(d); // [1, 2]` },
+
+  Deque__pollFirst: { type:'method', name:'pollFirst()', full:'Deque.pollFirst()',
+    points:[`Retrieves and removes the first element, or returns null if the deque is empty.`,
+             `Equivalent to poll() when the Deque is used as a Queue.`],
+    qa:[{q:`Deque.pollFirst() vs NavigableSet.pollFirst() — same behavior?`, a:`Conceptually similar ('remove the front'), but unrelated methods on unrelated interfaces — Deque's is about insertion-order position, NavigableSet's is about sorted-order position.`, tricky:true}],
+    example:`Deque<Integer> d = new ArrayDeque<>(List.of(1,2,3));
+System.out.println(d.pollFirst()); // 1` },
+
+  Deque__pollLast: { type:'method', name:'pollLast()', full:'Deque.pollLast()',
+    points:[`Retrieves and removes the last element, or returns null if the deque is empty.`,
+             `Useful for using a Deque as a stack-from-the-back or double-ended buffer.`],
+    qa:[{q:`Can you implement both a stack and a queue with just pollFirst()/pollLast()/addFirst()/addLast()?`, a:`Yes — that flexibility is exactly why Deque replaced both Stack and single-ended Queue as the recommended general-purpose choice.`}],
+    example:`Deque<Integer> d = new ArrayDeque<>(List.of(1,2,3));
+System.out.println(d.pollLast()); // 3` },
+
+  Deque__push: { type:'method', name:'push(e)', full:'Deque.push(E e)',
+    points:[`Pushes onto the 'stack' represented by this deque — equivalent to addFirst(e).`,
+             `Part of Deque's stack-emulation API, alongside pop() and peek().`],
+    qa:[{q:`Why does Deque.push() insert at the FRONT rather than the back?`, a:`Deque models a stack as growing from the front, so push()/pop() operate at addFirst()/removeFirst() — the opposite end from a Queue's offer()/poll().`, tricky:true}],
+    example:`Deque<Integer> stack = new ArrayDeque<>();
+stack.push(1); stack.push(2);
+System.out.println(stack); // [2, 1] — 2 is on top` },
+
+  Deque__pop: { type:'method', name:'pop()', full:'Deque.pop()',
+    points:[`Pops from the 'stack' represented by this deque — equivalent to removeFirst().`,
+             `Throws NoSuchElementException if the deque is empty (matching removeFirst(), not the null-returning poll-style).`],
+    qa:[{q:`Does Deque.pop() throw or return null on an empty deque?`, a:`It throws NoSuchElementException — pop()/push() belong to the throwing removeFirst()/addFirst() family, not the null-returning pollFirst() family.`, tricky:true}],
+    example:`Deque<Integer> stack = new ArrayDeque<>(List.of(2,1));
+System.out.println(stack.pop()); // 2` },
+
+  Map__put: { type:'method', name:'put(k,v)', full:'Map.put(K key, V value)',
+    points:[`Associates the value with the key, returning the PREVIOUS value (or null if the key was new).`,
+             `Overwrites any existing mapping for that key silently — use putIfAbsent() to avoid overwriting.`],
+    qa:[{q:`What does put() return for a new key vs. an overwritten one?`, a:`Returns null for a brand-new key, or the previous value if the key already existed — but this is ambiguous if the map allows null values, since 'new key' and 'existing key mapped to null' both return null.`, tricky:true}],
+    example:`Map<String,Integer> m = new HashMap<>();
+System.out.println(m.put("a", 1)); // null (new key)
+System.out.println(m.put("a", 2)); // 1 (previous value)` },
+
+  Map__get: { type:'method', name:'get(k)', full:'Map.get(Object key)',
+    points:[`Returns the value mapped to the key, or null if the key isn't present.`,
+             `O(1) average for HashMap/LinkedHashMap, O(log n) for TreeMap.`],
+    qa:[{q:`How do you distinguish 'key not present' from 'key present but mapped to null'?`, a:`get() alone can't tell them apart — both return null. Use containsKey(key) explicitly, or getOrDefault(key, sentinel).`, tricky:true}],
+    example:`Map<String,Integer> m = new HashMap<>();
+m.put("a", null);
+System.out.println(m.get("a"));         // null
+System.out.println(m.containsKey("a")); // true — key exists!` },
+
+  Map__remove: { type:'method', name:'remove(k)', full:'Map.remove(Object key)',
+    points:[`Removes the mapping for the key, returning the associated value (or null if absent).`,
+             `A two-arg overload remove(key, value) (Java 8+) only removes if the current mapping matches exactly.`],
+    qa:[{q:`Is Map.remove(k) related to Collection.remove(o)?`, a:`They share a name but differ: Map.remove(k) removes by KEY; Collection.remove(o) removes by matching an ELEMENT VALUE. Map doesn't extend Collection, so there's no real inheritance link.`, tricky:true}],
+    example:`Map<String,Integer> m = new HashMap<>(Map.of("a",1,"b",2));
+System.out.println(m.remove("a")); // 1` },
+
+  Map__containsKey: { type:'method', name:'containsKey(k)', full:'Map.containsKey(Object key)',
+    points:[`Returns true if the map has a mapping for the key, regardless of the value (even null).`,
+             `O(1) average for hash-based maps, O(log n) for TreeMap.`],
+    qa:[{q:`Is containsKey() the right way to check for a null-valued entry?`, a:`Yes — containsKey(key) unambiguously tells you whether the key exists, independent of what value (including null) it maps to.`}],
+    example:`Map<String,Integer> m = new HashMap<>();
+m.put("a", null);
+System.out.println(m.containsKey("a")); // true` },
+
+  Map__containsValue: { type:'method', name:'containsValue(v)', full:'Map.containsValue(Object value)',
+    points:[`Returns true if any key is mapped to the given value.`,
+             `Unlike containsKey(), this is O(n) — it must linearly scan values, which aren't indexed.`],
+    qa:[{q:`Is containsValue() as fast as containsKey()?`, a:`No — containsKey() is O(1) average (hash lookup); containsValue() must scan every entry's value, making it O(n).`, tricky:true}],
+    example:`Map<String,Integer> m = Map.of("a",1,"b",2);
+System.out.println(m.containsValue(2)); // true` },
+
+  Map__keySet: { type:'method', name:'keySet()', full:'Map.keySet()',
+    points:[`Returns a Set view of all keys, backed by the map.`,
+             `Removing from the keySet() view removes the corresponding entry from the map itself.`],
+    qa:[{q:`Can you add a new key directly through the keySet() view?`, a:`No — keySet().add(k) throws UnsupportedOperationException, because a bare key with no value would violate the Map contract.`, tricky:true}],
+    example:`Map<String,Integer> m = new HashMap<>(Map.of("a",1,"b",2));
+m.keySet().remove("a");
+System.out.println(m); // {b=2} — removed via the view` },
+
+  Map__values: { type:'method', name:'values()', full:'Map.values()',
+    points:[`Returns a Collection view of all values (not a Set — values can repeat).`,
+             `Also backed by the map: removing a value through this view removes the corresponding entry.`],
+    qa:[{q:`Why does values() return a Collection instead of a Set like keySet()?`, a:`Because multiple keys can map to the same value, so values can legitimately contain duplicates — a Set couldn't represent that faithfully.`}],
+    example:`Map<String,Integer> m = Map.of("a",1,"b",1);
+System.out.println(m.values()); // [1, 1]` },
+
+  Map__entrySet: { type:'method', name:'entrySet()', full:'Map.entrySet()',
+    points:[`Returns a Set of Map.Entry<K,V> objects — the recommended way to iterate a map's pairs.`,
+             `Each Entry supports getKey()/getValue(), and setValue() updates the map's value in place.`],
+    qa:[{q:`Is it more efficient to iterate entrySet() than keySet() + get()?`, a:`Yes — iterating keySet() and calling map.get(key) for every key performs a redundant second lookup per entry that entrySet() avoids entirely.`}],
+    example:`for (Map.Entry<String,Integer> e : Map.of("a",1,"b",2).entrySet()) {
+    System.out.println(e.getKey() + "=" + e.getValue());
+}` },
+
+  Map__putIfAbsent: { type:'method', name:'putIfAbsent(k,v)', full:'Map.putIfAbsent(K key, V value)',
+    points:[`Inserts the value only if the key is absent OR currently mapped to null; otherwise leaves the mapping untouched.`,
+             `Returns the existing value if present, or null if the new value was inserted.`],
+    qa:[{q:`Does putIfAbsent() overwrite a key mapped to null?`, a:`Yes — it treats 'mapped to null' the same as 'absent', so it WILL insert over a null-valued entry.`, tricky:true}],
+    example:`Map<String,Integer> m = new HashMap<>();
+m.putIfAbsent("a", 1);
+m.putIfAbsent("a", 2); // no-op, "a" already has a value
+System.out.println(m); // {a=1}` },
+
+  Map__getOrDefault: { type:'method', name:'getOrDefault(k,d)', full:'Map.getOrDefault(Object key, V defaultValue)',
+    points:[`Returns the value for the key, or the given default if the key is absent.`,
+             `Does NOT insert the default into the map — it's read-only, unlike computeIfAbsent().`],
+    qa:[{q:`Does getOrDefault() add the default value to the map if the key was missing?`, a:`No — it only returns the default for that call; the map is unchanged. Use computeIfAbsent() or putIfAbsent() if you want it actually stored.`, tricky:true}],
+    example:`Map<String,Integer> m = new HashMap<>();
+System.out.println(m.getOrDefault("a", 0)); // 0
+System.out.println(m.containsKey("a"));      // false — nothing was inserted` },
+
+  Map__merge: { type:'method', name:'merge(k,v,fn)', full:'Map.merge(K key, V value, BiFunction<V,V,V> remappingFn)',
+    points:[`If the key is absent (or null), sets it to value directly; otherwise combines the existing and new value with the remapping function.`,
+             `If the remapping function returns null, the entry is removed entirely.`],
+    qa:[{q:`For a word-count map, what does counts.merge(word, 1, Integer::sum) do the first time a word is seen?`, a:`It just inserts 1 — the remapping function is only invoked when the key already has a non-null value. A very common off-by-one misconception in interview solutions.`, tricky:true}],
+    example:`Map<String,Integer> counts = new HashMap<>();
+counts.merge("a", 1, Integer::sum); // {a=1} (function not called)
+counts.merge("a", 1, Integer::sum); // {a=2} (1 + 1)` },
+
+  Map__compute: { type:'method', name:'compute(k,fn)', full:'Map.compute(K key, BiFunction<K,V,V> remappingFn)',
+    points:[`Computes a new value for the key based on its current value (possibly null), and stores it.`,
+             `If the function returns null, the mapping is removed (or stays absent).`],
+    qa:[{q:`compute() vs merge() — when would you reach for compute() instead?`, a:`merge() suits a simple 'combine old and new value' pattern; compute() is more general — the remapping function also receives the key and can check for null explicitly.`}],
+    example:`Map<String,Integer> m = new HashMap<>(Map.of("a",1));
+m.compute("a", (k,v) -> v == null ? 1 : v + 1);
+System.out.println(m); // {a=2}` },
+
+  Map__forEach: { type:'method', name:'forEach()', full:'Map.forEach(BiConsumer<K,V> action)',
+    points:[`Applies the action to every key-value pair — a functional alternative to iterating entrySet().`,
+             `Iteration order follows the map's own order (unspecified for HashMap, insertion order for LinkedHashMap).`],
+    qa:[{q:`Can you safely add or remove entries from the map inside the forEach() lambda?`, a:`No — structurally modifying the map during forEach() throws ConcurrentModificationException; only Entry.setValue() (updating in place) is safe.`}],
+    example:`Map.of("a",1,"b",2).forEach((k,v) -> System.out.println(k + "=" + v));` },
+
+  NavigableMap__floorKey: { type:'method', name:'floorKey(k)', full:'NavigableMap.floorKey(K key)',
+    points:[`Returns the greatest key ≤ the given key, or null if none exists.`,
+             `The key-only counterpart to floorEntry(), which returns the full Map.Entry.`],
+    qa:[{q:`floorKey() vs floorEntry() — when would you prefer one?`, a:`Use floorKey() when you only need the key; floorEntry() when you also need the value, avoiding a second get() lookup.`}],
+    example:`NavigableMap<Integer,String> m = new TreeMap<>(Map.of(10,"a",20,"b",30,"c"));
+System.out.println(m.floorKey(25)); // 20` },
+
+  NavigableMap__ceilingKey: { type:'method', name:'ceilingKey(k)', full:'NavigableMap.ceilingKey(K key)',
+    points:[`Returns the smallest key ≥ the given key, or null if none exists.`,
+             `Inclusive of the given key if it's present in the map.`],
+    qa:[{q:`If the exact key exists, does ceilingKey(key) return it?`, a:`Yes — like NavigableSet's ceiling(), it's inclusive. Use higherKey() for a key strictly greater.`, tricky:true}],
+    example:`NavigableMap<Integer,String> m = new TreeMap<>(Map.of(10,"a",20,"b",30,"c"));
+System.out.println(m.ceilingKey(20)); // 20` },
+
+  NavigableMap__higherKey: { type:'method', name:'higherKey(k)', full:'NavigableMap.higherKey(K key)',
+    points:[`Returns the smallest key strictly greater than the given key, or null if none exists.`,
+             `Never returns the given key itself, even if present — unlike ceilingKey().`],
+    qa:[{q:`Is higherKey(k) guaranteed to differ from k when k is a key in the map?`, a:`Yes by definition — 'higher' is strict, always skipping past an exact match to the next key up (or null if k is the largest).`}],
+    example:`NavigableMap<Integer,String> m = new TreeMap<>(Map.of(10,"a",20,"b",30,"c"));
+System.out.println(m.higherKey(20)); // 30` },
+
+  NavigableMap__lowerKey: { type:'method', name:'lowerKey(k)', full:'NavigableMap.lowerKey(K key)',
+    points:[`Returns the greatest key strictly less than the given key, or null if none exists.`,
+             `The strict counterpart to floorKey(), just like lower()/floor() on NavigableSet.`],
+    qa:[{q:`What's returned by lowerKey(k) when k is the smallest key in the map?`, a:`null — there's no key strictly less than the smallest one.`}],
+    example:`NavigableMap<Integer,String> m = new TreeMap<>(Map.of(10,"a",20,"b",30,"c"));
+System.out.println(m.lowerKey(20)); // 10` },
+
+  NavigableMap__firstEntry: { type:'method', name:'firstEntry()', full:'NavigableMap.firstEntry()',
+    points:[`Returns the entry (key + value) with the smallest key, or null if the map is empty.`,
+             `Unlike SortedMap.firstKey(), it doesn't throw on an empty map — it returns null instead.`],
+    qa:[{q:`firstEntry() on an empty map — throw or null?`, a:`Returns null. This differs from SortedMap.firstKey(), which throws NoSuchElementException — a subtle inconsistency worth knowing.`, tricky:true}],
+    example:`NavigableMap<Integer,String> m = new TreeMap<>(Map.of(10,"a",20,"b"));
+System.out.println(m.firstEntry()); // 10=a` },
+
+  NavigableMap__lastEntry: { type:'method', name:'lastEntry()', full:'NavigableMap.lastEntry()',
+    points:[`Returns the entry with the largest key, or null if the map is empty.`,
+             `Complements firstEntry() for retrieving both ends without extra lookups.`],
+    qa:[{q:`Does modifying the returned Entry's value via setValue() affect the underlying map?`, a:`Yes — the returned Map.Entry is a live view into the map for TreeMap, so setValue() updates the stored value directly.`}],
+    example:`NavigableMap<Integer,String> m = new TreeMap<>(Map.of(10,"a",20,"b"));
+System.out.println(m.lastEntry()); // 20=b` },
+
+  NavigableMap__pollFirstEntry: { type:'method', name:'pollFirstEntry()', full:'NavigableMap.pollFirstEntry()',
+    points:[`Retrieves AND removes the entry with the smallest key in one call; returns null if empty.`,
+             `Handy for repeatedly draining a TreeMap in ascending key order.`],
+    qa:[{q:`Is pollFirstEntry() atomic with respect to concurrent access?`, a:`No — TreeMap is not thread-safe; the 'retrieve and remove in one call' is just single-threaded convenience, not a concurrency guarantee.`}],
+    example:`NavigableMap<Integer,String> m = new TreeMap<>(Map.of(2,"b",1,"a"));
+System.out.println(m.pollFirstEntry()); // 1=a
+System.out.println(m); // {2=b}` },
+
+  NavigableMap__pollLastEntry: { type:'method', name:'pollLastEntry()', full:'NavigableMap.pollLastEntry()',
+    points:[`Retrieves AND removes the entry with the largest key in one call; returns null if empty.`,
+             `The mirror of pollFirstEntry() for the high end of the map.`],
+    qa:[{q:`Could pollFirstEntry()/pollLastEntry() implement a double-ended priority map?`, a:`Yes — draining from either end in sorted-key order is exactly how you'd build a min/max priority structure keyed by something other than a plain priority number.`}],
+    example:`NavigableMap<Integer,String> m = new TreeMap<>(Map.of(2,"b",1,"a"));
+System.out.println(m.pollLastEntry()); // 2=b` },
+
+  SortedMap__firstKey: { type:'method', name:'firstKey()', full:'SortedMap.firstKey()',
+    points:[`Returns the smallest key in the map.`,
+             `Throws NoSuchElementException if the map is empty — unlike NavigableMap.firstEntry(), which returns null.`],
+    qa:[{q:`firstKey() vs firstEntry() on an empty map — same failure behavior?`, a:`No — firstKey() throws NoSuchElementException; firstEntry() returns null instead.`, tricky:true}],
+    example:`SortedMap<Integer,String> m = new TreeMap<>(Map.of(3,"c",1,"a"));
+System.out.println(m.firstKey()); // 1` },
+
+  SortedMap__lastKey: { type:'method', name:'lastKey()', full:'SortedMap.lastKey()',
+    points:[`Returns the largest key in the map.`,
+             `Also throws NoSuchElementException on an empty map.`],
+    qa:[{q:`Is there an O(1) way to get the largest key from a TreeMap?`, a:`No — lastKey() is O(log n)-ish, descending to the rightmost node; there's no O(1) access since it's not a plain sorted array.`}],
+    example:`SortedMap<Integer,String> m = new TreeMap<>(Map.of(3,"c",1,"a"));
+System.out.println(m.lastKey()); // 3` },
+
+  SortedMap__headMap: { type:'method', name:'headMap(to)', full:'SortedMap.headMap(K toKey)',
+    points:[`Returns a view of entries with keys strictly less than toKey.`,
+             `toKey itself is EXCLUDED — same convention as SortedSet.headSet().`],
+    qa:[{q:`Is headMap(toKey) a live view or a snapshot?`, a:`A live view backed by the original map — modifications through either the view or the source are reflected in both.`}],
+    example:`SortedMap<Integer,String> m = new TreeMap<>(Map.of(1,"a",2,"b",3,"c"));
+System.out.println(m.headMap(3)); // {1=a, 2=b}` },
+
+  SortedMap__tailMap: { type:'method', name:'tailMap(from)', full:'SortedMap.tailMap(K fromKey)',
+    points:[`Returns a view of entries with keys greater than or equal to fromKey.`,
+             `fromKey itself IS included, mirroring SortedSet.tailSet().`],
+    qa:[{q:`Combined, do headMap(k) and tailMap(k) cover every entry exactly once?`, a:`Yes — headMap(k) is [start, k) and tailMap(k) is [k, end], partitioning the whole map with no overlap and no gap.`}],
+    example:`SortedMap<Integer,String> m = new TreeMap<>(Map.of(1,"a",2,"b",3,"c"));
+System.out.println(m.tailMap(2)); // {2=b, 3=c}` },
+
+  SortedMap__subMap: { type:'method', name:'subMap(from,to)', full:'SortedMap.subMap(K fromKey, K toKey)',
+    points:[`Returns a view of entries with keys in the half-open range [fromKey, toKey).`,
+             `Equivalent to combining tailMap(fromKey) and headMap(toKey).`],
+    qa:[{q:`What happens if fromKey is greater than toKey?`, a:`It throws IllegalArgumentException — the JDK doesn't silently return an empty map for a backwards range.`, tricky:true}],
+    example:`SortedMap<Integer,String> m = new TreeMap<>(Map.of(1,"a",2,"b",3,"c",4,"d"));
+System.out.println(m.subMap(2,4)); // {2=b, 3=c}` },
+
+  Iterator__hasNext: { type:'method', name:'hasNext()', full:'Iterator.hasNext()',
+    points:[`Returns true if there's at least one more element to visit via next().`,
+             `Safe to call repeatedly — it doesn't advance the cursor.`],
+    qa:[{q:`Does calling hasNext() multiple times in a row move the iterator forward?`, a:`No — hasNext() only peeks at whether more elements remain; only next() advances the cursor.`}],
+    example:`Iterator<Integer> it = List.of(1,2).iterator();
+while (it.hasNext()) System.out.println(it.next());` },
+
+  Iterator__next: { type:'method', name:'next()', full:'Iterator.next()',
+    points:[`Returns the next element and advances the cursor.`,
+             `Throws NoSuchElementException if called with no elements remaining — always guard with hasNext() first.`],
+    qa:[{q:`What happens if you call next() without checking hasNext() and there's nothing left?`, a:`It throws NoSuchElementException — a common bug from an off-by-one in a manual while loop.`}],
+    example:`Iterator<Integer> it = List.of(1).iterator();
+it.next();
+// it.next(); // throws NoSuchElementException` },
+
+  Iterator__remove: { type:'method', name:'remove()', full:'Iterator.remove()',
+    points:[`Removes the last element returned by next() from the underlying collection — the only safe way to remove during iteration.`,
+             `Throws IllegalStateException if called before next(), or twice in a row without an intervening next().`],
+    qa:[{q:`Can you call it.remove() twice in a row without calling next() in between?`, a:`No — it throws IllegalStateException. remove() only works once per next() call.`, tricky:true}],
+    example:`List<Integer> l = new ArrayList<>(List.of(1,2,3));
+Iterator<Integer> it = l.iterator();
+it.next();
+it.remove();
+System.out.println(l); // [2, 3]` },
+
+  ListIterator__hasPrevious: { type:'method', name:'hasPrevious()', full:'ListIterator.hasPrevious()',
+    points:[`Returns true if there's an element before the cursor's current position.`,
+             `Symmetric to hasNext(), enabling traversal in either direction from wherever the cursor sits.`],
+    qa:[{q:`If you create a listIterator() and immediately call hasPrevious(), what does it return?`, a:`false — a fresh listIterator() starts before the first element, so nothing is 'previous' until you call next() at least once.`}],
+    example:`ListIterator<Integer> it = List.of(1,2).listIterator();
+System.out.println(it.hasPrevious()); // false` },
+
+  ListIterator__previous: { type:'method', name:'previous()', full:'ListIterator.previous()',
+    points:[`Returns the previous element and moves the cursor backward.`,
+             `Throws NoSuchElementException if called with no previous element (cursor at the start).`],
+    qa:[{q:`If you call next() then immediately previous(), do you get the same element twice?`, a:`Yes — the cursor sits between elements, so next() then previous() returns the exact same element both times.`, tricky:true}],
+    example:`ListIterator<String> it = List.of("a","b").listIterator();
+System.out.println(it.next());     // a
+System.out.println(it.previous()); // a (same element again)` },
+
+  ListIterator__nextIndex: { type:'method', name:'nextIndex()', full:'ListIterator.nextIndex()',
+    points:[`Returns the index that would be returned by a subsequent call to next().`,
+             `Equals list.size() if the cursor is at the end (no next element).`],
+    qa:[{q:`What does nextIndex() return when the cursor is at the very end of the list?`, a:`list.size() — one past the last valid index, signaling nothing is left for next().`}],
+    example:`ListIterator<String> it = List.of("a","b").listIterator();
+System.out.println(it.nextIndex()); // 0` },
+
+  ListIterator__previousIndex: { type:'method', name:'previousIndex()', full:'ListIterator.previousIndex()',
+    points:[`Returns the index that would be returned by a subsequent call to previous().`,
+             `Equals -1 if the cursor is at the very beginning.`],
+    qa:[{q:`What's the relationship between nextIndex() and previousIndex()?`, a:`previousIndex() is always exactly nextIndex() - 1 — they describe the same cursor gap from opposite sides.`}],
+    example:`ListIterator<String> it = List.of("a","b").listIterator();
+System.out.println(it.previousIndex()); // -1` },
+
+  ListIterator__set: { type:'method', name:'set(e)', full:'ListIterator.set(E e)',
+    points:[`Replaces the last element returned by next() or previous() with e.`,
+             `Throws IllegalStateException if called before any next()/previous(), or after a remove()/add() since the last one.`],
+    qa:[{q:`Can you call set() right after add(), without calling next()/previous() in between?`, a:`No — it throws IllegalStateException. set() replaces the last element RETURNED by next()/previous(), and add() doesn't count.`, tricky:true}],
+    example:`List<String> l = new ArrayList<>(List.of("a","b"));
+ListIterator<String> it = l.listIterator();
+it.next();
+it.set("A");
+System.out.println(l); // [A, b]` },
+
+  ListIterator__add: { type:'method', name:'add(e)', full:'ListIterator.add(E e)',
+    points:[`Inserts e immediately before the position that would be returned by next() (right at the cursor).`,
+             `Unlike Iterator, ListIterator can safely mutate the list during traversal without triggering ConcurrentModificationException.`],
+    qa:[{q:`Where does the newly-added element end up relative to the cursor?`, a:`It's inserted just before the cursor position, so a following next() call does NOT return the just-added element — the cursor effectively moves past it.`, tricky:true}],
+    example:`List<String> l = new ArrayList<>(List.of("a","c"));
+ListIterator<String> it = l.listIterator();
+it.next(); // returns "a"
+it.add("b");
+System.out.println(l); // [a, b, c]` },
+
+  Comparable__compareTo: { type:'method', name:'compareTo(o)', full:'Comparable.compareTo(T o)',
+    points:[`Returns negative/zero/positive depending on whether this object is less than, equal to, or greater than o.`,
+             `Should be consistent with equals() by convention, though not compiler-enforced.`],
+    qa:[{q:`Is it safe to compute compareTo() as this.value - o.value for integers?`, a:`Not always — it can silently overflow for large values, flipping the sign. Integer.compare(a, b) is the safe alternative used internally by the JDK.`, tricky:true}],
+    example:`class Point implements Comparable<Point> {
+    int dist;
+    public int compareTo(Point o) { return Integer.compare(dist, o.dist); } // safe
+}` },
+
+  Comparator__compare: { type:'method', name:'compare(o1,o2)', full:'Comparator.compare(T o1, T o2)',
+    points:[`Returns negative/zero/positive depending on the relative order of o1 and o2, same convention as compareTo().`,
+             `Implemented as a lambda in modern code, e.g. (a, b) -> Integer.compare(a.getAge(), b.getAge()).`],
+    qa:[{q:`Is (a, b) -> a.getAge() - b.getAge() a safe way to write compare()?`, a:`Only if the values are small and bounded — subtraction can overflow for large or negative differences, the same trap as Comparable. Integer.compare() avoids it.`, tricky:true}],
+    example:`List<Person> people = ...;
+people.sort((a, b) -> Integer.compare(a.getAge(), b.getAge()));` },
+
+  Comparator__reversed: { type:'method', name:'reversed()', full:'Comparator.reversed()',
+    points:[`Returns a new Comparator with the ordering flipped.`,
+             `Only reverses the comparator it's called on — any thenComparing() chained AFTER it keeps its own direction.`],
+    qa:[{q:`If you call .thenComparing(x) BEFORE .reversed(), does the tie-breaker get reversed too?`, a:`Yes — reversed() flips whatever comparator has been built up to that point, so calling it last reverses everything before it, including earlier thenComparing() calls.`, tricky:true}],
+    example:`Comparator<Person> byAgeThenName =
+    Comparator.comparing(Person::getAge).thenComparing(Person::getName);
+Comparator<Person> fullyReversed = byAgeThenName.reversed(); // reverses BOTH keys` },
+
+  Comparator__thenComparing: { type:'method', name:'thenComparing()', full:'Comparator.thenComparing(...)',
+    points:[`Chains a secondary comparator used only to break ties left by the primary comparator.`,
+             `Can be chained multiple times: comparing(a).thenComparing(b).thenComparing(c).`],
+    qa:[{q:`Does thenComparing() get used if the primary comparator already found a difference?`, a:`No — it's only consulted when the primary comparator returns 0 (a tie).`}],
+    example:`people.sort(Comparator.comparing(Person::getLastName)
+                       .thenComparing(Person::getFirstName));` },
+
+  Comparator__naturalOrder: { type:'method', name:'naturalOrder()', full:'Comparator.naturalOrder()',
+    points:[`Returns a Comparator that delegates to the elements' own Comparable.compareTo().`,
+             `Useful when an API requires a Comparator but you just want the type's default ordering.`],
+    qa:[{q:`What happens using naturalOrder() for a type that doesn't implement Comparable?`, a:`It compiles fine, but using it at runtime with non-Comparable elements throws ClassCastException on the first comparison.`, tricky:true}],
+    example:`Comparator<String> cmp = Comparator.naturalOrder();
+List<String> l = new ArrayList<>(List.of("b","a"));
+l.sort(cmp);` },
+
+  Comparator__reverseOrder: { type:'method', name:'reverseOrder()', full:'Comparator.reverseOrder()',
+    points:[`Returns a Comparator representing the reverse of the elements' natural ordering.`,
+             `Shorthand for Comparator.<T>naturalOrder().reversed().`],
+    qa:[{q:`Is Collections.reverseOrder() the same as Comparator.reverseOrder()?`, a:`Yes, functionally — Collections.reverseOrder() predates the Comparator static factory methods (added in Java 8) and is kept for backward compatibility.`}],
+    example:`PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());` },
+
+  Collections__sort: { type:'method', name:'sort(list)', full:'Collections.sort(List<T> list) / sort(list, comparator)',
+    points:[`Sorts the list in place using natural ordering, or the given Comparator if supplied.`,
+             `Uses a stable, adaptive merge sort (TimSort) — O(n log n) worst case; equal elements keep their relative order.`],
+    qa:[{q:`Is Collections.sort() stable — does it preserve the relative order of equal elements?`, a:`Yes — Java's object sort is guaranteed stable, unlike the sort used for primitive arrays, which isn't required to be.`, tricky:true}],
+    example:`List<Integer> l = new ArrayList<>(List.of(3,1,2));
+Collections.sort(l);
+System.out.println(l); // [1, 2, 3]` },
+
+  Collections__reverse: { type:'method', name:'reverse(list)', full:'Collections.reverse(List<?> list)',
+    points:[`Reverses the order of elements in the list, in place.`,
+             `O(n) — swaps elements from both ends moving toward the middle.`],
+    qa:[{q:`Does Collections.reverse() create a new list?`, a:`No — it mutates the given list in place and returns void; there's no copy involved.`}],
+    example:`List<Integer> l = new ArrayList<>(List.of(1,2,3));
+Collections.reverse(l);
+System.out.println(l); // [3, 2, 1]` },
+
+  Collections__shuffle: { type:'method', name:'shuffle(list)', full:'Collections.shuffle(List<?> list) / shuffle(list, Random)',
+    points:[`Randomly permutes the list's elements in place using a fair (uniform) shuffle algorithm.`,
+             `Passing your own Random with a fixed seed makes the shuffle reproducible — useful for tests.`],
+    qa:[{q:`Is Collections.shuffle() a truly uniform random permutation?`, a:`Yes — it implements the Fisher–Yates (Knuth) shuffle, giving every possible permutation an equal probability, unlike naive 'swap random pairs' approaches.`}],
+    example:`List<Integer> l = new ArrayList<>(List.of(1,2,3,4));
+Collections.shuffle(l, new Random(42)); // reproducible with a fixed seed` },
+
+  Collections__min: { type:'method', name:'min(coll)', full:'Collections.min(Collection<T> coll) / min(coll, comparator)',
+    points:[`Returns the smallest element according to natural ordering or a supplied Comparator.`,
+             `O(n) — scans every element; unlike TreeSet.first(), there's no maintained sorted structure to exploit.`],
+    qa:[{q:`Is Collections.min() faster on a sorted TreeSet than on an unsorted ArrayList?`, a:`No — it always does a full O(n) scan regardless of collection type. Calling treeSet.first() directly is the actually-faster option for a TreeSet.`, tricky:true}],
+    example:`System.out.println(Collections.min(List.of(5,1,9,3))); // 1` },
+
+  Collections__max: { type:'method', name:'max(coll)', full:'Collections.max(Collection<T> coll) / max(coll, comparator)',
+    points:[`Returns the largest element according to natural ordering or a supplied Comparator.`,
+             `Also O(n) for the same reason as min() — a full scan, no shortcuts.`],
+    qa:[{q:`What exception does Collections.max() throw on an empty collection?`, a:`NoSuchElementException — same as calling first()/last() on an empty sorted collection.`}],
+    example:`System.out.println(Collections.max(List.of(5,1,9,3))); // 9` },
+
+  Collections__binarySearch: { type:'method', name:'binarySearch(list,key)', full:'Collections.binarySearch(List<T> list, T key)',
+    points:[`Searches a SORTED list for key using binary search, returning its index if found.`,
+             `If not found, returns (-(insertion point) - 1), a negative number encoding where the key would go.`],
+    qa:[{q:`What happens if you call binarySearch() on a list that isn't actually sorted?`, a:`The result is undefined — it may return a wrong index, or fail to find an element that's present, because binary search assumes sortedness without verifying it.`, tricky:true}],
+    example:`List<Integer> l = List.of(1,3,5,7,9);
+System.out.println(Collections.binarySearch(l, 5));  // 2 (found)
+System.out.println(Collections.binarySearch(l, 4));  // -3 (would insert at index 2)` },
+
+  Collections__unmodifiableList: { type:'method', name:'unmodifiableList(list)', full:'Collections.unmodifiableList(List<T> list)',
+    points:[`Wraps the list in a read-only VIEW — mutation attempts through the view throw UnsupportedOperationException.`,
+             `Does NOT protect against changes made directly to the original backing list — those still show up through the view.`],
+    qa:[{q:`If the original list is modified after wrapping, does the wrapped view reflect that change?`, a:`Yes — it's a live view, not a defensive copy. For true independence, copy first: unmodifiableList(new ArrayList<>(original)).`, tricky:true}],
+    example:`List<Integer> mutable = new ArrayList<>(List.of(1,2));
+List<Integer> ro = Collections.unmodifiableList(mutable);
+mutable.add(3);
+System.out.println(ro); // [1, 2, 3] — view reflects the change` },
+
+  Collections__synchronizedList: { type:'method', name:'synchronizedList(list)', full:'Collections.synchronizedList(List<T> list)',
+    points:[`Wraps the list so every individual method call is synchronized on a common lock, making single operations thread-safe.`,
+             `Compound actions (like iteration) still require manually synchronizing on the returned list.`],
+    qa:[{q:`Is it safe to iterate a synchronizedList() with a for-each from multiple threads, no extra locking?`, a:`No — iteration must be manually wrapped in synchronized(list); the wrapper only guards individual calls, not a whole iteration.`, tricky:true}],
+    example:`List<Integer> syncList = Collections.synchronizedList(new ArrayList<>());
+synchronized (syncList) {
+    for (Integer i : syncList) { /* safe here */ }
+}` },
+
+  Collections__emptyList: { type:'method', name:'emptyList()', full:'Collections.emptyList()',
+    points:[`Returns an immutable, shared empty List instance — no allocation per call.`,
+             `Useful as a safe return value instead of null, avoiding NullPointerException in callers.`],
+    qa:[{q:`Does calling Collections.emptyList() allocate a new object each time?`, a:`No — it returns the same cached singleton instance every time, which is safe because the list is immutable.`}],
+    example:`List<String> l = someCondition ? results : Collections.emptyList();` },
+
+  Collections__frequency: { type:'method', name:'frequency(coll,o)', full:'Collections.frequency(Collection<?> c, Object o)',
+    points:[`Counts how many times o appears in the collection (via equals()).`,
+             `O(n) — always a full scan, regardless of collection type.`],
+    qa:[{q:`Is there a faster way than frequency() for repeated counting queries?`, a:`For repeated queries, build a Map<T,Integer> of counts once (via merge()) rather than calling frequency() — which rescans the whole collection — every time.`}],
+    example:`List<Integer> l = List.of(1,2,2,3,2);
+System.out.println(Collections.frequency(l, 2)); // 3` },
+
+  Collections__swap: { type:'method', name:'swap(list,i,j)', full:'Collections.swap(List<?> list, int i, int j)',
+    points:[`Swaps the elements at the two given indices in place.`,
+             `O(1) for a random-access list like ArrayList; used internally by shuffle().`],
+    qa:[{q:`Does Collections.swap() work efficiently on a LinkedList too?`, a:`It still works, but each index access on a LinkedList is O(n), making swap() effectively O(n) rather than the O(1) it is on an ArrayList.`, tricky:true}],
+    example:`List<Integer> l = new ArrayList<>(List.of(1,2,3));
+Collections.swap(l, 0, 2);
+System.out.println(l); // [3, 2, 1]` },
+
+  Collections__nCopies: { type:'method', name:'nCopies(n,o)', full:'Collections.nCopies(int n, T o)',
+    points:[`Returns an immutable List of length n, where every element is the SAME reference to o.`,
+             `Very memory-efficient for large n since only one object is actually stored, referenced n times.`],
+    qa:[{q:`If o is mutable, what happens when you mutate the single element inside an nCopies() list?`, a:`Every position reflects the change — they're all literally the same object reference, not n independent copies.`, tricky:true}],
+    example:`List<String> l = Collections.nCopies(3, "x");
+System.out.println(l); // [x, x, x]` }
+};
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+
+const TAG_LABEL = { interface: 'Interface', class: 'Class', method: 'Method' };
+const TAG_CLASS = { interface: 'iface', class: 'cls', method: 'method' };
+
+function openTerm(id, isMethod){
+  const source = isMethod ? METHODS : TERMS;
+  const d = source[id];
+  if(!d) return;
+  const tag = document.getElementById('tpTag');
+  tag.textContent = TAG_LABEL[d.type];
+  tag.className = 'tp-tag ' + TAG_CLASS[d.type];
+  document.getElementById('tpName').textContent = d.name || id;
+  document.getElementById('tpFull').textContent = d.full;
+  document.getElementById('tpPoints').innerHTML = d.points.map(p => `<li>${escapeHtml(p)}</li>`).join('');
+  document.getElementById('tpQA').innerHTML = d.qa.map(item => `
+    <div class="qa-item">
+      <div class="qa-q">${item.tricky ? '<span class="qa-tricky">Tricky</span>' : ''}Q: ${escapeHtml(item.q)}</div>
+      <div class="qa-a">${escapeHtml(item.a)}</div>
+    </div>`).join('');
+  document.getElementById('tpExample').textContent = d.example;
+  document.getElementById('termPanel').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('termPanel').scrollTop = 0;
+  document.querySelector('.term-panel-body').scrollTop = 0;
+}
+
+function closeTerm(){
+  document.getElementById('termPanel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-term]');
+  if (t){ openTerm(t.getAttribute('data-term'), false); return; }
+  const mtd = e.target.closest('[data-method]');
+  if (mtd){ openTerm(mtd.getAttribute('data-method'), true); return; }
+  if (e.target.id === 'overlay' || e.target.id === 'tpClose'){ closeTerm(); }
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeTerm(); });
+</script>
+
+</body>
+</html>
